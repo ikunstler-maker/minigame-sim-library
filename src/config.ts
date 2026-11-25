@@ -221,12 +221,7 @@ export const DEFAULT_PRESET: Preset = {
     amountAnim: 'counter',
     amountDelayMs: 600,
     amountDurationMs: 1600,
-    blocks: [
-      { kind: 'text', x: 50, y: 13, text: 'Coin Volcano Wallet', size: 22, color: '#ffffff', weight: '800', align: 'center' },
-      { kind: 'text', x: 50, y: 24, text: 'Balance', size: 15, color: '#9aa0aa', weight: '600', align: 'center' },
-      { kind: 'amount', x: 50, y: 30, text: '{balance}', size: 40, color: '#ffffff', weight: '800', align: 'center' },
-      { kind: 'text', x: 50, y: 38, text: '+{win} from Coin Volcano', size: 16, color: '#ffb02e', weight: '600', align: 'center' },
-    ],
+    blocks: [{ kind: 'amount', x: 50, y: 30, text: '{balance}', size: 40, color: '#ffffff', weight: '800', align: 'center' }],
   },
   game: {
     variant: 'code',
@@ -295,11 +290,16 @@ function merge<T>(base: T, over: unknown): T {
   return out as T;
 }
 
+/** Texts of the first page defaults, removed from saved presets (user asked for the amount only). */
+const OLD_PAGE_TEXTS = new Set(['Coin Volcano Wallet', 'Balance', '+{win} from Coin Volcano']);
+
 /** Load the saved preset, filling missing keys from defaults. */
 export function loadPreset(): Preset {
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? merge(structuredClone(DEFAULT_PRESET), JSON.parse(raw)) : structuredClone(DEFAULT_PRESET);
+    const p: Preset = raw ? merge(structuredClone(DEFAULT_PRESET), JSON.parse(raw)) : structuredClone(DEFAULT_PRESET);
+    p.page.blocks = p.page.blocks.filter((b) => !(b.kind === 'text' && OLD_PAGE_TEXTS.has(b.text)));
+    return p;
   } catch {
     return structuredClone(DEFAULT_PRESET);
   }

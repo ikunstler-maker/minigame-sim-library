@@ -124,6 +124,7 @@ async function renderStudio(): Promise<void> {
       <div class="row"><button id="page-bg-up">Background image…</button><button id="page-bg-clear">No image</button></div>
       ${select('page.amountAnim', 'Amount change', ['counter', 'spinner', 'pull'])}
       <p class="note">counter = counts up · spinner = loader, then the new number · pull = pull-to-refresh, then the new number</p>
+      <p class="note">Drag the amount on the phone (Page tab) to move it; set its size in "Size pt".</p>
       ${num('page.amountDelayMs', 'Start after (ms)', 0, 10000)}
       ${num('page.amountDurationMs', 'Duration (ms)', 100, 10000)}
       <div id="page-blocks">${pageBlocksHtml()}</div>
@@ -228,6 +229,17 @@ async function mountLive(): Promise<void> {
     live = new LivePreview();
     await live.init(host);
     live.onPick = (pk) => void focusPick(pk);
+    live.onMoveBlock = (i, x, y) => {
+      const p = structuredClone(preset);
+      p.page.blocks[i].x = x;
+      p.page.blocks[i].y = y;
+      commit(p, `page.blocks.${i}.text`);
+      // keep the X / Y fields in the settings in step
+      for (const [k, v] of [['x', x], ['y', y]] as const) {
+        const el = document.querySelector<HTMLInputElement>(`[data-path="page.blocks.${i}.${k}"]`);
+        if (el) el.value = String(v);
+      }
+    };
   } else {
     live.attach(host);
   }

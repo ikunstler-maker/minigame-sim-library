@@ -64,6 +64,8 @@ export class LivePreview {
 
   /** Fired when the mock is tapped on an editable element. */
   onPick: (p: Pick) => void = () => {};
+  /** Fired when a page block was dragged to a new place (centre in % of the screen). */
+  onMoveBlock: (index: number, xPct: number, yPct: number) => void = () => {};
   /** Fired with a short status line (loading, scene…). */
   onStatus: (s: string) => void = () => {};
 
@@ -255,11 +257,44 @@ export class LivePreview {
     for (let i = this.regions.length - 1; i >= 0; i--) {
       const g = this.regions[i];
       if (p.x >= g.x && p.x <= g.x + g.w && p.y >= g.y && p.y <= g.y + g.h) {
-        this.outline(g);
+        const m = g.field?.match(/^page\.blocks\.(\d+)\./);
+        if (m) this.dragBlock(e, g, Number(m[1]));
+        else this.outline(g);
         this.onPick(g);
         return;
       }
     }
+  }
+
+  /** Drag a page block: a yellow frame follows the pointer, the block moves on release. */
+  private dragBlock(e: PointerEvent, g: Region, index: number): void {
+    const start = this.toStage(e);
+    const frame = new Graphics().roundRect(0, 0, g.w + 12, g.h + 12, 18).stroke({ color: 0xffd23a, width: 8 });
+    frame.position.set(g.x - 6, g.y - 6);
+    this.overlay.addChild(frame);
+    let moved = false;
+    const move = (ev: PointerEvent) => {
+      const q = this.toStage(ev);
+      moved ||= Math.hypot(q.x - start.x, q.y - start.y) > 8;
+      frame.position.set(g.x - 6 + q.x - start.x, g.y - 6 + q.y - start.y);
+    };
+    const up = (ev: PointerEvent) => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      frame.destroy();
+      if (!moved) {
+        this.outline(g);
+        return;
+      }
+      const q = this.toStage(ev);
+      const block = this.preset.page.blocks[index];
+      const cx = (block.x / 100) * STAGE_W + (q.x - start.x);
+      const cy = (block.y / 100) * STAGE_H + (q.y - start.y);
+      const clamp = (v: number) => Math.round(Math.max(0, Math.min(100, v)) * 10) / 10;
+      this.onMoveBlock(index, clamp((cx / STAGE_W) * 100), clamp((cy / STAGE_H) * 100));
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
   }
 
   /** Outline the element a setting belongs to (hint = data-path or value key). */
