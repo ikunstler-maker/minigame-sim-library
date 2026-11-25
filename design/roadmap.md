@@ -6,7 +6,7 @@ internal company presentation. Key decisions: `design/decisions.md`.
 
 Each stage ends with a check on the real iPhone before the next one starts.
 
-## Stage 1 — Skeleton + on-device recording (highest risk)
+## Stage 1 — Skeleton + on-device recording (highest risk) — DONE 2026-11-25, verified on iPhone
 - Vite + TypeScript + PixiJS v8 project, PWA manifest, GitHub Pages deploy.
 - Two modes: Studio (HTML settings panel) and Preview (one 1080x1920 canvas).
 - Test animation + synthesized test sound recorded via `canvas.captureStream` +
@@ -16,7 +16,7 @@ Each stage ends with a check on the real iPhone before the next one starts.
   Back to Studio.
 - Done when: an mp4 recorded in Preview is saved to Photos on the iPhone.
 
-## Stage 2 — iOS home screen
+## Stage 2 — iOS home screen — BUILT 2026-11-25, awaiting iPhone check
 - Wallpaper, status bar (time, signal, battery), 4x6 icon grid, dock,
   2x2 weather widget (manual values).
 - Studio: drag-and-drop icons, custom PNG icons, labels, weather fields.

@@ -44,6 +44,18 @@ company plan include private Pages access control? If not: unlisted URL only,
 IndexedDB autosave + JSON preset export/import. No GitHub token in the browser
 (dropped from the external plan).
 
+## D9. Stage size and iOS look (Stage 2)
+Stage is 1080x2340 (iPhone 19.5:9), not 1080x1920, so the home screen fills the
+phone without bars. Geometry is in points × `PT` (1080/402).
+Defaults: time 10:37, battery 42 %, status bar per the iOS 27 reference (Dynamic
+Island, fill-style battery). Weather widget: Toronto, late autumn, Mostly Cloudy.
+Live weather for the current day (Open-Meteo, no key) is planned for later.
+iOS icons are cut from the user's sheet by `tools/asset-pipeline/cut_ios_icons.py`
+(watermark removed, rounded mask) into `public/ios/icons/`. Maps keeps faint
+watermark traces; it is not used by default.
+Game art (e.g. the Coin Volcano icon) lives in `public/private/` (gitignored), so
+the public GitHub Pages build shows a lettered placeholder instead.
+
 ## D8. Kept ideas from the external plan
 Plugin interface per game (crash, roulette later); calibration overlay with a
 reference image; stage-by-stage check on the real phone; data-driven presets

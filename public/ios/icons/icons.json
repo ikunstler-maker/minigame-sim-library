@@ -1,0 +1,202 @@
+[
+ {
+  "id": "books",
+  "label": "Books",
+  "file": "books.png"
+ },
+ {
+  "id": "calculator",
+  "label": "Calculator",
+  "file": "calculator.png"
+ },
+ {
+  "id": "calendar",
+  "label": "Calendar",
+  "file": "calendar.png"
+ },
+ {
+  "id": "camera",
+  "label": "Camera",
+  "file": "camera.png"
+ },
+ {
+  "id": "clock",
+  "label": "Clock",
+  "file": "clock.png"
+ },
+ {
+  "id": "facetime",
+  "label": "Facetime",
+  "file": "facetime.png"
+ },
+ {
+  "id": "files",
+  "label": "Files",
+  "file": "files.png"
+ },
+ {
+  "id": "find-my",
+  "label": "Find My",
+  "file": "find-my.png"
+ },
+ {
+  "id": "notes",
+  "label": "Notes",
+  "file": "notes.png"
+ },
+ {
+  "id": "contacts",
+  "label": "Contacts",
+  "file": "contacts.png"
+ },
+ {
+  "id": "health",
+  "label": "Health",
+  "file": "health.png"
+ },
+ {
+  "id": "phone",
+  "label": "Phone",
+  "file": "phone.png"
+ },
+ {
+  "id": "home",
+  "label": "Home",
+  "file": "home.png"
+ },
+ {
+  "id": "itunes-store",
+  "label": "iTunes Store",
+  "file": "itunes-store.png"
+ },
+ {
+  "id": "photos",
+  "label": "Photos",
+  "file": "photos.png"
+ },
+ {
+  "id": "maps",
+  "label": "Maps",
+  "file": "maps.png"
+ },
+ {
+  "id": "wallet",
+  "label": "Wallet",
+  "file": "wallet.png"
+ },
+ {
+  "id": "messages",
+  "label": "Messages",
+  "file": "messages.png"
+ },
+ {
+  "id": "music",
+  "label": "Music",
+  "file": "music.png"
+ },
+ {
+  "id": "mail",
+  "label": "Mail",
+  "file": "mail.png"
+ },
+ {
+  "id": "reminders",
+  "label": "Reminders",
+  "file": "reminders.png"
+ },
+ {
+  "id": "safari",
+  "label": "Safari",
+  "file": "safari.png"
+ },
+ {
+  "id": "settings",
+  "label": "Settings",
+  "file": "settings.png"
+ },
+ {
+  "id": "shortcuts",
+  "label": "Shortcuts",
+  "file": "shortcuts.png"
+ },
+ {
+  "id": "app-store",
+  "label": "App Store",
+  "file": "app-store.png"
+ },
+ {
+  "id": "weather",
+  "label": "Weather",
+  "file": "weather.png"
+ },
+ {
+  "id": "airdrop",
+  "label": "Airdrop",
+  "file": "airdrop.png"
+ },
+ {
+  "id": "tv",
+  "label": "TV",
+  "file": "tv.png"
+ },
+ {
+  "id": "voice-memos",
+  "label": "Voice Memos",
+  "file": "voice-memos.png"
+ },
+ {
+  "id": "watch",
+  "label": "Watch",
+  "file": "watch.png"
+ },
+ {
+  "id": "translate",
+  "label": "Translate",
+  "file": "translate.png"
+ },
+ {
+  "id": "testflight",
+  "label": "TestFlight",
+  "file": "testflight.png"
+ },
+ {
+  "id": "magnifier",
+  "label": "Magnifier",
+  "file": "magnifier.png"
+ },
+ {
+  "id": "freeform",
+  "label": "Freeform",
+  "file": "freeform.png"
+ },
+ {
+  "id": "fitness",
+  "label": "Fitness",
+  "file": "fitness.png"
+ },
+ {
+  "id": "measure",
+  "label": "Measure",
+  "file": "measure.png"
+ },
+ {
+  "id": "news",
+  "label": "News",
+  "file": "news.png"
+ },
+ {
+  "id": "passwords",
+  "label": "Passwords",
+  "file": "passwords.png"
+ },
+ {
+  "id": "stocks",
+  "label": "Stocks",
+  "file": "stocks.png"
+ },
+ {
+  "id": "podcasts",
+  "label": "Podcasts",
+  "file": "podcasts.png"
+ }
+]

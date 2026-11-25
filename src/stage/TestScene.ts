@@ -18,7 +18,7 @@ export class TestScene extends Container {
     this.addChild(bg);
 
     const clock = new Text({
-      text: preset.clock,
+      text: preset.statusBar.time,
       style: { fill: '#ffffff', fontFamily: '-apple-system, Helvetica, Arial', fontSize: 50, fontWeight: '600' },
     });
     clock.position.set(110, 48);

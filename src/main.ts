@@ -1,9 +1,10 @@
-import { Application } from 'pixi.js';
 import './style.css';
-import { STAGE_H, STAGE_W, loadPreset, savePreset, type Preset } from './config';
+import { STAGE_H, STAGE_W, loadPreset, resetPreset, savePreset, type Preset, type WeatherCondition } from './config';
 import { AudioBus } from './audio/AudioBus';
 import { CanvasRecorder, pickMimeType, type Recording } from './recorder/CanvasRecorder';
-import { TestScene } from './stage/TestScene';
+import { StageApp } from './stage/StageApp';
+import { HomeEditor } from './studio/HomeEditor';
+import { loadCatalog } from './ios/iconCatalog';
 
 const studioEl = document.getElementById('studio')!;
 const previewEl = document.getElementById('preview')!;
@@ -12,7 +13,7 @@ const hotspotEl = document.getElementById('exit-hotspot')!;
 const exportEl = document.getElementById('export')!;
 
 let preset: Preset = loadPreset();
-let app: Application | null = null;
+let stage: StageApp | null = null;
 let audio: AudioBus | null = null;
 let recorder: CanvasRecorder | null = null;
 let lastRecording: Recording | null = null;
@@ -25,36 +26,116 @@ function show(mode: Mode): void {
   exportEl.hidden = mode !== 'export';
 }
 
+function commit(p: Preset): void {
+  preset = p;
+  if (!savePreset(p)) alert('Storage is full: the last change was not saved. Use smaller images.');
+}
+
+// ---------- Studio form helpers ----------
+const CONDITIONS: WeatherCondition[] = ['sunny', 'partly-cloudy', 'cloudy', 'rain', 'storm', 'snow', 'fog', 'night-clear'];
+
+function getPath(obj: unknown, path: string): unknown {
+  return path.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown>)?.[k], obj);
+}
+function setPath(obj: unknown, path: string, value: unknown): void {
+  const keys = path.split('.');
+  const last = keys.pop()!;
+  const parent = keys.reduce<unknown>((o, k) => (o as Record<string, unknown>)[k], obj) as Record<string, unknown>;
+  parent[last] = value;
+}
+const attr = (v: unknown) => String(v ?? '').replace(/"/g, '&quot;');
+
+function text(path: string, label: string): string {
+  return `<label>${label} <input data-path="${path}" value="${attr(getPath(preset, path))}"></label>`;
+}
+function num(path: string, label: string, min?: number, max?: number): string {
+  return `<label>${label} <input data-path="${path}" data-type="number" type="number" inputmode="decimal" ${min !== undefined ? `min="${min}"` : ''} ${max !== undefined ? `max="${max}"` : ''} value="${attr(getPath(preset, path))}"></label>`;
+}
+function check(path: string, label: string): string {
+  return `<label class="chk"><input data-path="${path}" data-type="bool" type="checkbox" ${getPath(preset, path) ? 'checked' : ''}> ${label}</label>`;
+}
+function color(path: string, label: string): string {
+  return `<label>${label} <input data-path="${path}" type="color" value="${attr(getPath(preset, path))}"></label>`;
+}
+function select(path: string, label: string, options: (string | number)[], numeric = false): string {
+  const cur = String(getPath(preset, path));
+  const opts = options.map((o) => `<option ${String(o) === cur ? 'selected' : ''}>${o}</option>`).join('');
+  return `<label>${label} <select data-path="${path}" ${numeric ? 'data-type="number"' : ''}>${opts}</select></label>`;
+}
+
 // ---------- Studio ----------
-function renderStudio(): void {
+let homeEditor: HomeEditor | null = null;
+
+async function renderStudio(): Promise<void> {
   const mime = pickMimeType() || 'not supported';
+  const hourly = preset.weather.hourly
+    .map((_, i) => `<div class="hour">${num(`weather.hourly.${i}.temp`, `#${i + 1}`)}${select(`weather.hourly.${i}.condition`, '', CONDITIONS)}</div>`)
+    .join('');
   studioEl.innerHTML = `
-    <h1>Sim Studio <small>Stage 1</small></h1>
-    <section>
-      <label>Clock <input id="f-clock" value="${preset.clock}"></label>
-      <label>Background <input id="f-bg" type="color" value="${preset.background}"></label>
-      <label><input id="f-tone" type="checkbox" ${preset.testTone ? 'checked' : ''}> Test beep every second</label>
-      <label><input id="f-auto" type="checkbox" ${preset.autoRecord ? 'checked' : ''}> Record automatically</label>
-      <label>FPS <select id="f-fps">${[30, 60].map((f) => `<option ${f === preset.fps ? 'selected' : ''}>${f}</option>`).join('')}</select></label>
-    </section>
+    <h1>Sim Studio <small>Stage 2</small></h1>
     <button id="b-preview" class="primary">▶ Preview</button>
-    <p class="note">Recording format on this device: <b>${mime}</b></p>
-    <p class="note">To finish a take: tap the clock (top-left) ${preset.exitTapCount} times quickly.</p>
+    <p class="note">Record format here: <b>${mime}</b>. To finish a take, tap the clock ${preset.exitTapCount}× quickly.</p>
+
+    <details open><summary>Home screen</summary><div id="home-editor"></div></details>
+
+    <details><summary>Status bar</summary><section>
+      ${text('statusBar.time', 'Time')}
+      ${num('statusBar.battery', 'Battery %', 1, 100)}
+      ${check('statusBar.batteryShowPercent', 'Show % inside battery')}
+      ${check('statusBar.charging', 'Charging')}
+      ${check('statusBar.lowPowerMode', 'Low Power Mode')}
+      ${select('statusBar.signal', 'Signal bars', [0, 1, 2, 3, 4], true)}
+      ${check('statusBar.wifi', 'Wi-Fi')}
+      ${select('statusBar.style', 'Text colour', ['dark', 'light'])}
+      ${check('statusBar.showDynamicIsland', 'Dynamic Island')}
+    </section></details>
+
+    <details><summary>Weather widget</summary><section>
+      ${check('weather.enabled', 'Show widget')}
+      ${select('weather.row', 'Widget row', [0, 1, 2, 3, 4], true)}
+      ${text('weather.city', 'City')}
+      ${check('weather.showLocationArrow', 'Location arrow')}
+      ${num('weather.temp', 'Temperature')}
+      ${select('weather.condition', 'Condition icon', CONDITIONS)}
+      ${text('weather.conditionLabel', 'Condition text')}
+      ${num('weather.high', 'High')}
+      ${num('weather.low', 'Low')}
+      ${text('weather.highLabel', 'High label')}
+      ${text('weather.lowLabel', 'Low label')}
+      ${select('weather.hourFormat', 'Hours', ['12h', '24h'])}
+      ${color('weather.gradient.0', 'Gradient top')}
+      ${color('weather.gradient.1', 'Gradient bottom')}
+      <p class="note">Hourly forecast (starts at the hour after the status-bar time):</p>
+      ${hourly}
+      <p class="note">Live weather for the current day is planned for a later stage.</p>
+    </section></details>
+
+    <details><summary>Recording</summary><section>
+      ${check('autoRecord', 'Record automatically')}
+      ${select('fps', 'FPS', [30, 60], true)}
+      ${check('testTone', 'Stage 1 test scene (beep)')}
+    </section></details>
+
+    <div class="row"><button id="b-reset">Reset all settings</button></div>
   `;
-  const val = (id: string) => (document.getElementById(id) as HTMLInputElement);
-  const sync = () => {
-    preset = {
-      ...preset,
-      clock: val('f-clock').value,
-      background: val('f-bg').value,
-      testTone: val('f-tone').checked,
-      autoRecord: val('f-auto').checked,
-      fps: Number(val('f-fps').value),
-    };
-    savePreset(preset);
-  };
-  studioEl.querySelectorAll('input,select').forEach((el) => el.addEventListener('change', sync));
+
+  studioEl.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-path]').forEach((el) => {
+    el.addEventListener('change', () => {
+      const p = structuredClone(preset);
+      const type = el.dataset.type;
+      const v = type === 'bool' ? (el as HTMLInputElement).checked : type === 'number' ? Number(el.value) : el.value;
+      setPath(p, el.dataset.path!, v);
+      commit(p);
+      homeEditor?.render();
+    });
+  });
   document.getElementById('b-preview')!.addEventListener('click', () => void startPreview());
+  document.getElementById('b-reset')!.addEventListener('click', () => {
+    if (!confirm('Reset every setting to the defaults?')) return;
+    preset = resetPreset();
+    void renderStudio();
+  });
+  homeEditor = new HomeEditor(document.getElementById('home-editor')!, () => preset, commit, await loadCatalog());
 }
 
 // ---------- Preview ----------
@@ -64,26 +145,13 @@ async function startPreview(): Promise<void> {
   audio ??= new AudioBus();
   await audio.resume();
 
-  app = new Application();
-  await app.init({
-    width: STAGE_W,
-    height: STAGE_H,
-    background: preset.background,
-    antialias: true,
-    resolution: 1,
-    autoDensity: false,
-    preserveDrawingBuffer: true,
-    // WebGPU canvases do not feed canvas.captureStream reliably; WebGL does.
-    preference: 'webgl',
-  });
-  wrapEl.prepend(app.canvas);
-  const scene = new TestScene(preset, audio);
-  app.stage.addChild(scene);
-  app.ticker.add((t) => scene.update(t.deltaMS));
+  stage = new StageApp(preset, audio);
+  const canvas = await stage.init();
+  wrapEl.prepend(canvas);
   fitStage();
 
   if (preset.autoRecord) {
-    recorder = new CanvasRecorder(app.canvas, audio.recordStream);
+    recorder = new CanvasRecorder(canvas, audio.recordStream);
     try {
       recorder.start(preset.fps, preset.videoBitrate);
     } catch (e) {
@@ -96,17 +164,18 @@ async function startPreview(): Promise<void> {
 async function stopPreview(): Promise<void> {
   const rec = recorder ? await recorder.stop() : null;
   recorder = null;
-  app?.destroy(true, { children: true });
-  app = null;
+  stage?.destroy();
+  stage = null;
   if (rec) {
     lastRecording = rec;
     renderExport();
   } else {
+    void renderStudio();
     show('studio');
   }
 }
 
-/** Fit the 9:16 stage inside the viewport (letterboxed). */
+/** Fit the stage inside the viewport (letterboxed when aspect differs). */
 function fitStage(): void {
   const scale = Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H);
   wrapEl.style.width = `${STAGE_W * scale}px`;
@@ -160,10 +229,10 @@ function renderExport(): void {
   });
   document.getElementById('b-again')!.addEventListener('click', () => void startPreview());
   document.getElementById('b-back')!.addEventListener('click', () => {
-    renderStudio();
+    void renderStudio();
     show('studio');
   });
 }
 
-renderStudio();
+void renderStudio();
 show('studio');
