@@ -220,7 +220,7 @@ export class HomeEditor {
   }
 
   /** Bottom sheet for one slot: pick from the collection, rename, upload, role, remove. */
-  private openSheet(ref: SlotRef): void {
+  openSheet(ref: SlotRef): void {
     const cur = this.get(ref);
     const draft: IconSlot = cur ? { ...cur } : { iconId: '', label: '', role: 'app' };
     const sheet = document.createElement('div');

@@ -8,6 +8,7 @@ import { loadCatalog } from './ios/iconCatalog';
 import { itemText, valueKey, type PatchText } from './games/coin-volcano-plate/numbersLayer';
 import { editableValues } from './games/coin-volcano-code/values';
 import { fileToIcon, pickImage } from './studio/images';
+import { LivePreview, type LiveScene, type Pick } from './studio/LivePreview';
 
 const studioEl = document.getElementById('studio')!;
 const previewEl = document.getElementById('preview')!;
@@ -29,9 +30,10 @@ function show(mode: Mode): void {
   exportEl.hidden = mode !== 'export';
 }
 
-function commit(p: Preset): void {
+function commit(p: Preset, hint?: string): void {
   preset = p;
   if (!savePreset(p)) alert('Storage is full: the last change was not saved. Use smaller images.');
+  void live?.update(p, hint);
 }
 
 // ---------- Studio form helpers ----------
@@ -74,14 +76,14 @@ async function renderStudio(): Promise<void> {
   const hourly = preset.weather.hourly
     .map((_, i) => `<div class="hour">${num(`weather.hourly.${i}.temp`, `#${i + 1}`)}${select(`weather.hourly.${i}.condition`, '', CONDITIONS)}</div>`)
     .join('');
-  studioEl.innerHTML = `
-    <h1>Sim Studio <small>Stage 2</small></h1>
+  const settingsHtml = `
+    <h1>Sim Studio <small>Coin Volcano</small></h1>
     <button id="b-preview" class="primary">▶ Preview</button>
     <p class="note">Record format here: <b>${mime}</b>. To finish a take, tap the clock ${preset.exitTapCount}× quickly.</p>
 
-    <details open><summary>Home screen</summary><div id="home-editor"></div></details>
+    <details id="sec-home" open><summary>Home screen</summary><div id="home-editor"></div></details>
 
-    <details><summary>Game — Coin Volcano</summary><section>
+    <details id="sec-game"><summary>Game — Coin Volcano</summary><section>
       ${select('game.variant', 'Version', ['plate', 'code'])}
       <p class="note">plate = reference video with your numbers on top · code = every symbol and number drawn as our own element</p>
       ${select('game.soundtrack', 'Sound', ['full', 'sfx', 'off'])}
@@ -97,7 +99,7 @@ async function renderStudio(): Promise<void> {
       <div id="game-values" class="values"><p class="note">Loading…</p></div>
     </section></details>
 
-    <details><summary>Notification (end of the take)</summary><section>
+    <details id="sec-push"><summary>Notification (end of the take)</summary><section>
       ${check('push.enabled', 'Show a notification after the big win')}
       <div class="push-icon"><img id="push-icon-img" alt=""><select id="push-icon-sel"></select><button id="push-icon-up">Upload…</button></div>
       ${text('push.title', 'Title')}
@@ -107,7 +109,7 @@ async function renderStudio(): Promise<void> {
       ${select('push.style', 'Style', ['light', 'dark'])}
     </section></details>
 
-    <details><summary>Status bar</summary><section>
+    <details id="sec-status"><summary>Status bar</summary><section>
       ${text('statusBar.time', 'Time')}
       ${num('statusBar.battery', 'Battery %', 1, 100)}
       ${check('statusBar.batteryShowPercent', 'Show % inside battery')}
@@ -119,7 +121,7 @@ async function renderStudio(): Promise<void> {
       ${check('statusBar.showDynamicIsland', 'Dynamic Island')}
     </section></details>
 
-    <details><summary>Weather widget</summary><section>
+    <details id="sec-weather"><summary>Weather widget</summary><section>
       ${check('weather.enabled', 'Show widget')}
       ${select('weather.row', 'Widget row', [0, 1, 2, 3, 4], true)}
       ${text('weather.city', 'City')}
@@ -139,13 +141,32 @@ async function renderStudio(): Promise<void> {
       <p class="note">Live weather for the current day is planned for a later stage.</p>
     </section></details>
 
-    <details><summary>Recording</summary><section>
+    <details id="sec-rec"><summary>Recording</summary><section>
       ${check('autoRecord', 'Record automatically')}
       ${select('fps', 'FPS', [30, 60], true)}
       ${check('testTone', 'Stage 1 test scene (beep)')}
     </section></details>
 
     <div class="row"><button id="b-reset">Reset all settings</button></div>
+  `;
+  studioEl.innerHTML = `
+    <div class="studio-grid">
+      <div class="settings">${settingsHtml}</div>
+      <aside class="live">
+        <div class="live-tabs">
+          <button data-scene="home">Home screen</button>
+          <button data-scene="game">Game</button>
+          <button data-scene="push">Notification</button>
+        </div>
+        <div class="live-time" hidden>
+          <input id="live-t" type="range" min="0" max="38.6" step="0.1" value="${liveTime}">
+          <span id="live-t-label">${liveTime.toFixed(1)} s</span>
+        </div>
+        <div id="live-host"></div>
+        <p id="live-status" class="note"></p>
+        <p class="note">Tap any element on the phone to edit it. The changed element is outlined.</p>
+      </aside>
+    </div>
   `;
 
   void bindPushIcon();
@@ -155,7 +176,7 @@ async function renderStudio(): Promise<void> {
       const type = el.dataset.type;
       const v = type === 'bool' ? (el as HTMLInputElement).checked : type === 'number' ? Number(el.value) : el.value;
       setPath(p, el.dataset.path!, v);
-      commit(p);
+      commit(p, el.dataset.path);
       homeEditor?.render();
       if (el.dataset.path === 'game.variant') void renderGameValues();
     });
@@ -166,8 +187,74 @@ async function renderStudio(): Promise<void> {
     preset = resetPreset();
     void renderStudio();
   });
-  homeEditor = new HomeEditor(document.getElementById('home-editor')!, () => preset, commit, await loadCatalog());
-  void renderGameValues();
+  homeEditor = new HomeEditor(document.getElementById('home-editor')!, () => preset, (p) => commit(p, 'home'), await loadCatalog());
+  gameValuesReady = renderGameValues();
+  await mountLive();
+}
+
+// ---------- Live phone mock ----------
+let live: LivePreview | null = null;
+let liveScene: LiveScene = 'home';
+let liveTime = 14;
+let gameValuesReady: Promise<void> = Promise.resolve();
+
+async function mountLive(): Promise<void> {
+  const host = document.getElementById('live-host')!;
+  const status = document.getElementById('live-status')!;
+  if (!live) {
+    live = new LivePreview();
+    await live.init(host);
+    live.onPick = (pk) => void focusPick(pk);
+  } else {
+    live.attach(host);
+  }
+  live.onStatus = (s) => (status.textContent = s);
+  const timeRow = document.querySelector<HTMLElement>('.live-time')!;
+  const slider = document.getElementById('live-t') as HTMLInputElement;
+  const label = document.getElementById('live-t-label')!;
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.live-tabs button');
+  const setScene = (sc: LiveScene) => {
+    liveScene = sc;
+    tabs.forEach((b) => b.classList.toggle('on', b.dataset.scene === sc));
+    timeRow.hidden = sc !== 'game';
+    void live!.setScene(sc);
+  };
+  tabs.forEach((b) => b.addEventListener('click', () => setScene(b.dataset.scene as LiveScene)));
+  let pending = false;
+  slider.addEventListener('input', () => {
+    liveTime = Number(slider.value);
+    label.textContent = `${liveTime.toFixed(1)} s`;
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      pending = false;
+      void live!.setTime(liveTime);
+    });
+  });
+  await live.update(preset);
+  await live.setTime(liveTime);
+  setScene(liveScene);
+}
+
+/** Open the settings of the element tapped on the phone, focus and highlight its field. */
+async function focusPick(pk: Pick): Promise<void> {
+  const sec = document.getElementById(pk.section) as HTMLDetailsElement | null;
+  if (!sec) return;
+  sec.open = true;
+  if (pk.slot) {
+    homeEditor?.openSheet(pk.slot);
+    return;
+  }
+  if (pk.section === 'sec-game') await gameValuesReady;
+  const field = pk.field
+    ? sec.querySelector<HTMLElement>(`[data-value-key="${CSS.escape(pk.field)}"], [data-path="${CSS.escape(pk.field)}"]`)
+    : null;
+  const target = (field?.closest('label') as HTMLElement | null) ?? sec;
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  target.classList.remove('pulse');
+  void target.offsetWidth;
+  target.classList.add('pulse');
+  if (field instanceof HTMLInputElement) setTimeout(() => field.focus({ preventScroll: true }), 350);
 }
 
 /** Notification icon: pick from the icon collection or upload a PNG. */
@@ -228,7 +315,7 @@ function bindValueInputs(box: HTMLElement): void {
       const k = el.dataset.valueKey!;
       if (el.value === '') delete p.game.values[k];
       else p.game.values[k] = Number(el.value);
-      commit(p);
+      commit(p, k);
     }),
   );
 }

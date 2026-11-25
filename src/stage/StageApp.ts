@@ -1,14 +1,11 @@
 import { Application, Container, Graphics, Sprite } from 'pixi.js';
 import { PT, STAGE_H, STAGE_W, type Preset } from '../config';
 import type { AudioBus } from '../audio/AudioBus';
-import { loadCatalog, slotUrl } from '../ios/iconCatalog';
-import { NotificationBanner } from './ios/NotificationBanner';
+import { loadCatalog } from '../ios/iconCatalog';
+import { createGame, createPushBanner, type AnyGame } from '../games/createGame';
 import { GameStub } from './GameStub';
-import { loadTexture } from './textures';
 import { PlateGame } from '../games/coin-volcano-plate/PlateGame';
 import { CodeGame } from '../games/coin-volcano-code/CodeGame';
-import { NumbersLayer, deriveTotals, type PatchText } from '../games/coin-volcano-plate/numbersLayer';
-import { loadGameFonts } from '../games/coin-volcano-plate/numbers/numberStyles';
 import { HomeScreen, ICON, type OpenRequest } from './ios/HomeScreen';
 import { StatusBar } from './ios/StatusBar';
 import { TestScene } from './TestScene';
@@ -26,7 +23,7 @@ export class StageApp {
   private scenes = new Container();
   private statusLayer = new Container();
   private busy = false;
-  private gamePromise: Promise<PlateGame | CodeGame | null> | null = null;
+  private gamePromise: Promise<AnyGame | null> | null = null;
   private home: HomeScreen | null = null;
 
   constructor(private readonly preset: Preset, private readonly audio: AudioBus) {}
@@ -123,74 +120,16 @@ export class StageApp {
     this.busy = false;
   }
 
-  /**
-   * Load the plate game with its numbers. Returns null when the private plate files
-   * are not on this build (e.g. the public site), so the placeholder is shown instead.
-   */
-  private async loadGame(): Promise<PlateGame | CodeGame | null> {
-    const g = this.preset.game;
-    if (g.variant === 'code') return this.loadCodeGame();
-    if (g.variant !== 'plate') {
-      this.home?.setGameProgress(1);
-      return null;
-    }
-    try {
-      await loadGameFonts();
-      const base = './private/coin-volcano/plate/';
-      let items: { id?: string; text?: PatchText }[] = [];
-      try {
-        const json = await fetch(`${base}patches.json`).then((r) => r.json());
-        items = Array.isArray(json) ? json : (json.items ?? []);
-      } catch {
-        /* no patches: plain plate */
-      }
-      const [gold, red, whirl] = await Promise.all(['coin-gold', 'coin-red', 'whirl'].map((n) => loadTexture(`${base}coins/${n}.png`)));
-      const numbers = new NumbersLayer(deriveTotals(items, g.values), g.currency, { gold, red, whirl });
-      const game = new PlateGame({
-        baseUrl: base,
-        audio: g.soundtrack === 'off' ? null : this.audio,
-        audioUrl: g.soundtrack === 'sfx' ? `${base}audio-sfx.m4a` : `${base}audio.m4a`,
-        ticker: this.app.ticker,
-        makeContent: numbers.makeContent,
-        showTapAreas: g.showTapAreas,
-        autoContinueMs: g.manualSpin ? undefined : g.autoContinueMs,
-        onProgress: (p) => this.home?.setGameProgress(p),
-      });
-      await game.load();
-      this.app.ticker.add(() => numbers.update(game.time));
-      game.onFinished = () => this.schedulePush();
-      return game;
-    } catch (e) {
-      console.warn('Plate game unavailable, showing placeholder:', e);
-      this.home?.setGameProgress(1);
-      return null;
-    }
-  }
-
-  /** Element-based variant: every symbol and number is our own element (no video under the board). */
-  private async loadCodeGame(): Promise<CodeGame | null> {
-    const g = this.preset.game;
-    try {
-      await loadGameFonts();
-      const base = './private/coin-volcano/';
-      const game = new CodeGame({
-        baseUrl: base,
-        audio: g.soundtrack === 'off' ? null : this.audio,
-        audioUrl: g.soundtrack === 'off' ? null : `${base}plate/${g.soundtrack === 'sfx' ? 'audio-sfx' : 'audio'}.m4a`,
-        ticker: this.app.ticker,
-        values: g.values,
-        currency: g.currency,
-        autoContinueMs: g.manualSpin ? undefined : g.autoContinueMs,
-        onProgress: (p) => this.home?.setGameProgress(p),
-      });
-      await game.load();
-      game.onFinished = () => this.schedulePush();
-      return game;
-    } catch (e) {
-      console.warn('Code game unavailable, showing placeholder:', e);
-      this.home?.setGameProgress(1);
-      return null;
-    }
+  /** Load the configured game variant; the pie on the icon shows the download. */
+  private async loadGame(): Promise<AnyGame | null> {
+    const game = await createGame(this.preset, {
+      ticker: this.app.ticker,
+      audio: this.audio,
+      onProgress: (p) => this.home?.setGameProgress(p),
+    });
+    this.home?.setGameProgress(1);
+    if (game) game.onFinished = () => this.schedulePush();
+    return game;
   }
 
   /**
@@ -204,7 +143,7 @@ export class StageApp {
     this.scenes.addChild(game);
     if (t === undefined) game.start();
     else await game.debugFreeze(t);
-    (window as unknown as { plate: PlateGame | CodeGame }).plate = game;
+    (window as unknown as { plate: AnyGame }).plate = game;
   }
 
   /** Show the end-of-take notification banner (Stage 5 adds tap → layout page). */
@@ -221,9 +160,7 @@ export class StageApp {
 
   private async showPush(): Promise<void> {
     if (this.app.renderer === null) return;
-    const p = this.preset.push;
-    const url = p.iconId === 'custom' ? (p.customSrc ?? '') : slotUrl({ iconId: p.iconId, label: '', role: 'app' }, await loadCatalog());
-    const banner = new NotificationBanner(p, await loadTexture(url));
+    const banner = await createPushBanner(this.preset);
     this.statusLayer.addChild(banner);
     await banner.show(this.app.ticker);
   }

@@ -76,6 +76,11 @@ export class NotificationBanner extends Container {
     this.position.set(MARGIN, -h - 20 * PT);
   }
 
+  /** Put the banner in its final place without animation (Studio preview). */
+  placeShown(): void {
+    this.y = this.targetY;
+  }
+
   /** Slide in from above the screen with a little spring. */
   show(ticker: Ticker, ms = 550): Promise<void> {
     const from = this.y;
