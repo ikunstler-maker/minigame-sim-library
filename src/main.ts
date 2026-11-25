@@ -7,8 +7,9 @@ import { HomeEditor } from './studio/HomeEditor';
 import { loadCatalog } from './ios/iconCatalog';
 import { itemText, valueKey, type PatchText } from './games/coin-volcano-plate/numbersLayer';
 import { editableValues } from './games/coin-volcano-code/values';
-import { fileToIcon, fileToWallpaper, pickImage } from './studio/images';
+import { fileToIcon, fileToWallpaper, pickFile, pickImage } from './studio/images';
 import { CURRENCIES, LOCALES, formatCurrency, separatorsFor } from './money';
+import { FONT_CHOICES, fileToFont } from './fonts';
 import { LivePreview, type LiveScene, type Pick } from './studio/LivePreview';
 
 const studioEl = document.getElementById('studio')!;
@@ -122,6 +123,7 @@ async function renderStudio(): Promise<void> {
       ${check('page.enabled', 'Open the page when the notification is tapped')}
       ${color('page.background', 'Background colour')}
       <div class="row"><button id="page-bg-up">Background image…</button><button id="page-bg-clear">No image</button></div>
+      ${pairSelect('page.backgroundFit', 'Background image placement', FIT_OPTIONS.filter(([v]) => v !== 'free'), preset.page.backgroundFit ?? 'cover')}
       ${select('page.amountAnim', 'Amount change', ['counter', 'spinner', 'pull'])}
       <p class="note">counter = counts up · spinner = loader, then the new number · pull = pull-to-refresh, then the new number</p>
       <p class="note">Drag the amount on the phone (Page tab) to move it; set its size in "Size pt".</p>
@@ -293,16 +295,30 @@ async function focusPick(pk: Pick): Promise<void> {
   if (field instanceof HTMLInputElement) setTimeout(() => field.focus({ preventScroll: true }), 350);
 }
 
+const FIT_OPTIONS: [string, string][] = [['cover', 'Fill the screen (crop)'], ['width', 'Fit 100% width'], ['height', 'Fit 100% height'], ['stretch', 'Stretch to the screen'], ['free', 'Free (X / Y / width)']];
+
+/** <select> with value/label pairs, bound by data-path. */
+function pairSelect(path: string, label: string, options: [string, string][], cur: string): string {
+  const opts = options.map(([v, l]) => `<option value="${attr(v)}" ${v === cur ? 'selected' : ''}>${l}</option>`).join('');
+  return `<label>${label} <select data-path="${path}">${opts}</select></label>`;
+}
+
+function fontOptions(): [string, string][] {
+  return [...FONT_CHOICES.map((f) => [f.id, f.label] as [string, string]), ...preset.customFonts.map((f) => [`custom:${f.name}`, `${f.name} (uploaded)`] as [string, string])];
+}
+
 /** Editor rows for the page blocks (data-path bound like every other field). */
 function pageBlocksHtml(): string {
   return preset.page.blocks
     .map((b, i) => {
       const P = `page.blocks.${i}`;
-      const content =
-        b.kind === 'image'
-          ? `<button data-block-img="${i}">${b.imageSrc ? 'Change image…' : 'Choose image…'}</button>`
-          : `<label>${b.kind === 'amount' ? 'Amount' : 'Text'} <input data-path="${P}.text" value="${attr(b.text)}" ${b.kind === 'amount' ? 'disabled' : ''}></label>`;
-      const style = b.kind === 'image' ? '' : color(`${P}.color`, 'Colour') + select(`${P}.weight`, 'Weight', ['400', '600', '800']) + select(`${P}.align`, 'Align', ['left', 'center', 'right']);
+      const isImg = b.kind === 'image';
+      const content = isImg
+        ? `<button data-block-img="${i}">${b.imageSrc ? 'Change image…' : 'Choose image…'}</button>${pairSelect(`${P}.fit`, 'Placement', FIT_OPTIONS, b.fit ?? 'free')}`
+        : `<label>${b.kind === 'amount' ? 'Amount' : 'Text'} <input data-path="${P}.text" value="${attr(b.text)}" ${b.kind === 'amount' ? 'disabled' : ''}></label>
+           ${color(`${P}.color`, 'Colour')}
+           <div class="font-row">${pairSelect(`${P}.font`, 'Font', fontOptions(), b.font ?? 'system')}<button data-font-up="${i}">Upload font…</button></div>`;
+      const style = isImg ? '' : select(`${P}.weight`, 'Weight', ['400', '600', '800']) + select(`${P}.align`, 'Align', ['left', 'center', 'right']);
       return `<div class="block-row" id="block-${i}">
         <div class="block-head"><b>${i + 1}. ${b.kind}</b><button data-del="${i}" title="Delete">✕</button></div>
         ${content}
@@ -349,6 +365,7 @@ function bindRegionAndPage(): void {
       const kind = b.dataset.add as PageBlockKind;
       p.page.blocks.push({
         kind, x: 50, y: 50, text: kind === 'amount' ? '{balance}' : 'New text', size: kind === 'image' ? 40 : 18,
+        fit: kind === 'image' ? 'cover' : undefined,
         color: '#ffffff', weight: kind === 'amount' ? '800' : '600', align: 'center',
       });
       commit(p, `page.blocks.${p.page.blocks.length - 1}.text`);
@@ -360,6 +377,18 @@ function bindRegionAndPage(): void {
       const p = structuredClone(preset);
       p.page.blocks.splice(Number(b.dataset.del), 1);
       commit(p, 'page.');
+      void renderStudio();
+    }),
+  );
+  document.querySelectorAll<HTMLButtonElement>('[data-font-up]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      const f = await pickFile('.ttf,.otf,.woff,.woff2,font/*');
+      if (!f) return;
+      const font = await fileToFont(f);
+      const p = structuredClone(preset);
+      p.customFonts = [...p.customFonts.filter((c) => c.name !== font.name), font];
+      p.page.blocks[Number(b.dataset.fontUp)].font = `custom:${font.name}`;
+      commit(p, `page.blocks.${b.dataset.fontUp}.text`);
       void renderStudio();
     }),
   );

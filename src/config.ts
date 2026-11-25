@@ -7,6 +7,8 @@ export type WeatherCondition =
   | 'sunny' | 'partly-cloudy' | 'cloudy' | 'rain' | 'storm' | 'snow' | 'night-clear' | 'fog';
 
 /** One slot on the home screen or dock. */
+import type { CustomFont } from './fonts';
+
 export interface IconSlot {
   /** Catalog id (e.g. 'safari', 'coin-volcano') or 'custom'. */
   iconId: string;
@@ -89,6 +91,12 @@ export interface PushConfig {
 
 export type PageBlockKind = 'text' | 'image' | 'amount';
 
+/**
+ * How an image sits on the screen: free (X / Y / width), cover (fill the screen,
+ * crop the overflow), width (100 % wide), height (100 % tall), stretch (exactly the screen).
+ */
+export type ImageFit = 'free' | 'cover' | 'width' | 'height' | 'stretch';
+
 /** One element on the page opened from the notification. Positions in % of the screen. */
 export interface PageBlock {
   kind: PageBlockKind;
@@ -104,14 +112,19 @@ export interface PageBlock {
   align: 'left' | 'center' | 'right';
   /** Data URL for image blocks. */
   imageSrc?: string;
+  /** Image placement (image blocks). */
+  fit?: ImageFit;
+  /** Font id for text / amount (see src/fonts.ts FONT_CHOICES, or 'custom:<name>'). */
+  font?: string;
 }
 
 /** The page (game wallet screen) opened by tapping the notification. */
 export interface PageConfig {
   enabled: boolean;
   background: string;
-  /** Data URL of a full-screen background image (cover). */
+  /** Data URL of a full-screen background image. */
   backgroundImage?: string;
+  backgroundFit: ImageFit;
   /** How the amount changes from {start} to {balance}. */
   amountAnim: 'counter' | 'spinner' | 'pull';
   /** Delay before the amount changes, ms. */
@@ -161,6 +174,8 @@ export interface Preset {
   game: GameConfig;
   push: PushConfig;
   page: PageConfig;
+  /** Fonts uploaded in Studio (data URLs). */
+  customFonts: CustomFont[];
   /** Country number format and currency, used by the notification and the page. */
   region: { locale: string; currency: string };
 }
@@ -215,9 +230,11 @@ export const DEFAULT_PRESET: Preset = {
     startBalance: 1000,
   },
   region: { locale: 'en-AU', currency: 'AUD' },
+  customFonts: [],
   page: {
     enabled: true,
     background: '#14161c',
+    backgroundFit: 'cover',
     amountAnim: 'counter',
     amountDelayMs: 600,
     amountDurationMs: 1600,

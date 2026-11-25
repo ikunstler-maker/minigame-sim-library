@@ -125,7 +125,7 @@ export class LivePreview {
       if (this.scene === 'page') {
         this.setStatus('');
         const v = await takeValues(this.preset, this.takeId);
-        const page = await PageScene.create(this.preset.page, v, this.preset.region);
+        const page = await PageScene.create(this.preset.page, v, this.preset.region, this.preset.customFonts);
         this.root.addChild(page, new StatusBar({ ...this.preset.statusBar, style: 'light' }));
         this.regions = [
           { x: 0, y: 0, w: STAGE_W, h: STAGE_H, section: 'sec-page', field: 'page.background', label: 'Page background' },

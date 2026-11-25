@@ -185,7 +185,7 @@ export class StageApp {
   /** Tap on the notification: the page grows out of the banner, then the amount animates. */
   private async openPage(banner: Container, v: TakeValues): Promise<void> {
     if (!this.preset.page.enabled) return;
-    const page = await PageScene.create(this.preset.page, v, this.preset.region);
+    const page = await PageScene.create(this.preset.page, v, this.preset.region, this.preset.customFonts);
     const b = banner.getBounds();
     const mask = new Graphics();
     page.mask = mask;
