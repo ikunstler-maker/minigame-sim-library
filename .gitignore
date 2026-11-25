@@ -38,6 +38,11 @@ docs/consistency-failures.md
 # === Build Output ===
 build/
 builds/
+dist/
+node_modules/
+
+# === Proprietary game art (3OAKS kit) — kept out of the public repo, see design/decisions.md D6 ===
+Assets/
 bin/
 # ...but not an addon's own scripts: gdUnit4's test runner lives in
 # addons/gdUnit4/bin/, and without it neither /smoke-check nor CI can run tests.
