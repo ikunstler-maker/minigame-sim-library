@@ -87,6 +87,8 @@ export interface PushConfig {
    * Title and body may use {win} {balance} {start} {id} {currency}.
    */
   startBalance: number;
+  /** Add the line "Balance: {balance}" under the transaction line. */
+  showBalance: boolean;
 }
 
 export type PageBlockKind = 'text' | 'image' | 'amount';
@@ -228,6 +230,7 @@ export const DEFAULT_PRESET: Preset = {
     delayMs: 900,
     style: 'light',
     startBalance: 1000,
+    showBalance: true,
   },
   region: { locale: 'en-AU', currency: 'AUD' },
   customFonts: [],

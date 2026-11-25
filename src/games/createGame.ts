@@ -104,10 +104,20 @@ export async function takeValues(preset: Preset, id: string): Promise<TakeValues
   return { win, start, balance: start + win, id };
 }
 
+/**
+ * Fixed notification text of the game wallet (design system of the in-game app):
+ * last 4 digits of the wallet ID (new in every take) and the credited amount; optional
+ * balance line. Only the title and icon are edited in Studio.
+ */
+export function pushBodyTemplate(showBalance: boolean): string {
+  return 'Wallet *{id}. Transaction: +{win}' + (showBalance ? '\nBalance: {balance}' : '');
+}
+
 /** Build the end-of-take notification banner from the preset (not yet shown). */
 export async function createPushBanner(preset: Preset, v: TakeValues): Promise<NotificationBanner> {
   const p = preset.push;
   const url = p.iconId === 'custom' ? (p.customSrc ?? '') : slotUrl({ iconId: p.iconId, label: '', role: 'app' }, await loadCatalog());
-  const filled = { ...p, title: fillTemplate(p.title, v, preset.region), body: fillTemplate(p.body, v, preset.region) };
+  const body = pushBodyTemplate(p.showBalance ?? true);
+  const filled = { ...p, title: fillTemplate(p.title, v, preset.region), body: fillTemplate(body, v, preset.region) };
   return new NotificationBanner(filled, await loadTexture(url));
 }

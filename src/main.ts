@@ -105,9 +105,9 @@ async function renderStudio(): Promise<void> {
       ${check('push.enabled', 'Show a notification after the big win')}
       <div class="push-icon"><img id="push-icon-img" alt=""><select id="push-icon-sel"></select><button id="push-icon-up">Upload…</button></div>
       ${text('push.title', 'Title')}
-      <label>Text <textarea data-path="push.body" rows="3">${attr(preset.push.body)}</textarea></label>
+      ${check('push.showBalance', 'Add the balance line')}
       ${num('push.startBalance', 'Wallet balance before the win', 0)}
-      <p class="note">Auto-filled: <b>{win}</b> big win from the game settings · <b>{balance}</b> = balance before + win · <b>{start}</b> balance before · <b>{id}</b> new random 4 digits in every take · <b>{currency}</b> sign. Amounts follow Region &amp; currency.</p>
+      <p class="note">Text (automatic): <b>Wallet *NNNN. Transaction: +win</b>${preset.push.showBalance ? ' / <b>Balance: balance</b>' : ''} — NNNN = new last 4 digits of the wallet ID in every take, win = big win from the game settings, balance = balance before + win (the same number as on the Page). Currency and number format follow Region &amp; currency.</p>
       ${text('push.timeLabel', 'Time label')}
       ${num('push.delayMs', 'Delay after the win (ms)', 0, 10000)}
       ${select('push.style', 'Style', ['light', 'dark'])}
@@ -204,6 +204,7 @@ async function renderStudio(): Promise<void> {
       setPath(p, el.dataset.path!, v);
       commit(p, el.dataset.path);
       homeEditor?.render();
+      if (el.dataset.path === 'push.showBalance') void renderStudio();
       if (el.dataset.path === 'game.variant') void renderGameValues();
     });
   });
