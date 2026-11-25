@@ -1,5 +1,5 @@
 import './style.css';
-import { STAGE_H, STAGE_W, loadPreset, resetPreset, savePreset, type PageBlockKind, type Preset, type WeatherCondition } from './config';
+import { STAGE_H, STAGE_W, fromPresetFile, loadPreset, resetPreset, savePreset, toPresetFile, type PageBlockKind, type Preset, type WeatherCondition } from './config';
 import { AudioBus } from './audio/AudioBus';
 import { CanvasRecorder, pickMimeType, type Recording } from './recorder/CanvasRecorder';
 import { StageApp } from './stage/StageApp';
@@ -19,6 +19,8 @@ const hotspotEl = document.getElementById('exit-hotspot')!;
 const exportEl = document.getElementById('export')!;
 
 let preset: Preset = loadPreset();
+/** Name used for the last saved / opened preset file. */
+let presetName = '';
 let stage: StageApp | null = null;
 let audio: AudioBus | null = null;
 let recorder: CanvasRecorder | null = null;
@@ -81,6 +83,11 @@ async function renderStudio(): Promise<void> {
   const settingsHtml = `
     <h1>Sim Studio <small>Coin Volcano</small></h1>
     <button id="b-preview" class="primary">▶ Preview</button>
+    <div class="row">
+      <button id="b-save-preset">💾 Save preset file</button>
+      <button id="b-open-preset">📂 Open preset file</button>
+    </div>
+    <p class="note">The file contains every setting, including wallpaper, icons, fonts and images. Send it to a colleague; they open it here with "Open preset file".</p>
     <p class="note">Record format here: <b>${mime}</b>. To finish a take, tap the clock ${preset.exitTapCount}× quickly.</p>
 
     <details id="sec-home" open><summary>Home screen</summary><div id="home-editor"></div></details>
@@ -209,6 +216,8 @@ async function renderStudio(): Promise<void> {
     });
   });
   document.getElementById('b-preview')!.addEventListener('click', () => void startPreview());
+  document.getElementById('b-save-preset')!.addEventListener('click', () => void savePresetFile());
+  document.getElementById('b-open-preset')!.addEventListener('click', () => void openPresetFile());
   document.getElementById('b-reset')!.addEventListener('click', () => {
     if (!confirm('Reset every setting to the defaults?')) return;
     preset = resetPreset();
@@ -403,6 +412,45 @@ function bindRegionAndPage(): void {
       void renderStudio();
     }),
   );
+}
+
+/** Save the whole preset as a .json file (share sheet on iPhone, download elsewhere). */
+async function savePresetFile(): Promise<void> {
+  const name = prompt('Preset name', presetName || 'coin-volcano')?.trim();
+  if (!name) return;
+  presetName = name;
+  const json = JSON.stringify(toPresetFile(preset, name), null, 1);
+  const fileName = `${name.replace(/[^\w\- ]+/g, '_')}.sim-preset.json`;
+  const file = new File([json], fileName, { type: 'application/json' });
+  if (navigator.canShare?.({ files: [file] }) && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+    try {
+      await navigator.share({ files: [file], title: name });
+      return;
+    } catch {
+      /* cancelled: fall back to a download */
+    }
+  }
+  const url = URL.createObjectURL(file);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/** Load a preset file and replace the current settings (asks first). */
+async function openPresetFile(): Promise<void> {
+  const f = await pickFile('.json,application/json');
+  if (!f) return;
+  try {
+    const { name, preset: p } = fromPresetFile(JSON.parse(await f.text()));
+    if (!confirm(`Replace the current settings with "${name}"?`)) return;
+    presetName = name;
+    commit(p);
+    void renderStudio();
+  } catch (e) {
+    alert((e as Error).message || 'Could not read this file.');
+  }
 }
 
 /** Notification icon: pick from the icon collection or upload a PNG. */

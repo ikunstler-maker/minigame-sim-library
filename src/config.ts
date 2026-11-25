@@ -310,6 +310,30 @@ function merge<T>(base: T, over: unknown): T {
   return out as T;
 }
 
+/** File format of a saved preset (shared between people as a .json file). */
+export interface PresetFile {
+  app: 'sim-studio';
+  version: 2;
+  name: string;
+  savedAt: string;
+  preset: Preset;
+}
+
+/** Wrap the preset for saving to a file (images and fonts are embedded as data URLs). */
+export function toPresetFile(p: Preset, name: string): PresetFile {
+  return { app: 'sim-studio', version: 2, name, savedAt: new Date().toISOString(), preset: p };
+}
+
+/**
+ * Read a preset file. Missing keys (older files) are filled from the defaults.
+ * Throws when the file is not a Sim Studio preset.
+ */
+export function fromPresetFile(json: unknown): { name: string; preset: Preset } {
+  const f = json as Partial<PresetFile>;
+  if (!f || f.app !== 'sim-studio' || typeof f.preset !== 'object') throw new Error('This is not a Sim Studio preset file.');
+  return { name: f.name ?? 'preset', preset: merge(structuredClone(DEFAULT_PRESET), f.preset) };
+}
+
 /** Texts of the first page defaults, removed from saved presets (user asked for the amount only). */
 const OLD_PAGE_TEXTS = new Set(['Coin Volcano Wallet', 'Balance', '+{win} from Coin Volcano']);
 
