@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Coin Volcano code test</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #111; overflow: hidden; touch-action: none; }
+    #wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+    #readout {
+      position: fixed; left: 8px; top: 8px; z-index: 2; padding: 4px 8px; border-radius: 6px;
+      font: 13px/1.3 ui-monospace, Menlo, Consolas, monospace; color: #0f8; background: rgba(0,0,0,.6);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="readout"></div>
+  <div id="wrap"></div>
+  <script type="module" src="/src/games/coin-volcano-code/devPage.ts"></script>
+</body>
+</html>

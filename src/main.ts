@@ -6,6 +6,7 @@ import { StageApp } from './stage/StageApp';
 import { HomeEditor } from './studio/HomeEditor';
 import { loadCatalog } from './ios/iconCatalog';
 import { itemText, valueKey, type PatchText } from './games/coin-volcano-plate/numbersLayer';
+import { editableValues } from './games/coin-volcano-code/values';
 
 const studioEl = document.getElementById('studio')!;
 const previewEl = document.getElementById('preview')!;
@@ -81,7 +82,7 @@ async function renderStudio(): Promise<void> {
 
     <details><summary>Game — Coin Volcano</summary><section>
       ${select('game.variant', 'Version', ['plate', 'code'])}
-      <p class="note">plate = the reference take replayed with your numbers · code = fully coded version (coming later, for comparison)</p>
+      <p class="note">plate = reference video with your numbers on top · code = every symbol and number drawn as our own element</p>
       ${select('game.soundtrack', 'Sound', ['full', 'sfx', 'off'])}
       ${text('game.currency.prefix', 'Currency before')}
       ${text('game.currency.suffix', 'Currency after')}
@@ -144,6 +145,7 @@ async function renderStudio(): Promise<void> {
       setPath(p, el.dataset.path!, v);
       commit(p);
       homeEditor?.render();
+      if (el.dataset.path === 'game.variant') void renderGameValues();
     });
   });
   document.getElementById('b-preview')!.addEventListener('click', () => void startPreview());
@@ -156,10 +158,43 @@ async function renderStudio(): Promise<void> {
   void renderGameValues();
 }
 
+/** Fields for the element-based variant, from its script.json. */
+async function renderCodeValues(box: HTMLElement): Promise<void> {
+  let list: { key: string; label: string; default: number }[] = [];
+  try {
+    const script = await fetch('./private/coin-volcano/code/script.json').then((r) => r.json());
+    list = editableValues(script);
+  } catch {
+    box.innerHTML = '<p class="note">Game files are not on this build.</p>';
+    return;
+  }
+  box.innerHTML =
+    list
+      .map((v) => {
+        const cur = preset.game.values[v.key];
+        return `<label>${v.label} <input data-value-key="${attr(v.key)}" type="number" inputmode="decimal" step="0.01" placeholder="${v.default}" value="${cur ?? ''}"></label>`;
+      })
+      .join('') + '<p class="note">Totals are computed: bar = sum of coins, big win = total × multiplier.</p>';
+  bindValueInputs(box);
+}
+
+function bindValueInputs(box: HTMLElement): void {
+  box.querySelectorAll<HTMLInputElement>('[data-value-key]').forEach((el) =>
+    el.addEventListener('change', () => {
+      const p = structuredClone(preset);
+      const k = el.dataset.valueKey!;
+      if (el.value === '') delete p.game.values[k];
+      else p.game.values[k] = Number(el.value);
+      commit(p);
+    }),
+  );
+}
+
 /** One editable field per number found in the plate's patches.json. */
 async function renderGameValues(): Promise<void> {
   const box = document.getElementById('game-values');
   if (!box) return;
+  if (preset.game.variant === 'code') return renderCodeValues(box);
   let items: { id?: string; text?: PatchText }[] = [];
   try {
     const json = await fetch('./private/coin-volcano/plate/patches.json').then((r) => r.json());
@@ -185,15 +220,7 @@ async function renderGameValues(): Promise<void> {
       return `<label>${r.label} <input data-value-key="${attr(k)}" type="number" inputmode="decimal" step="0.01" placeholder="${attr(r.ref)}" value="${v ?? ''}"></label>`;
     })
     .join('');
-  box.querySelectorAll<HTMLInputElement>('[data-value-key]').forEach((el) =>
-    el.addEventListener('change', () => {
-      const p = structuredClone(preset);
-      const k = el.dataset.valueKey!;
-      if (el.value === '') delete p.game.values[k];
-      else p.game.values[k] = Number(el.value);
-      commit(p);
-    }),
-  );
+  bindValueInputs(box);
 }
 
 // ---------- Preview ----------
@@ -299,5 +326,7 @@ show('studio');
 const qs = new URLSearchParams(location.search);
 if (qs.has('game')) {
   const t = qs.get('t');
+  const variant = qs.get('variant');
+  if (variant === 'plate' || variant === 'code') preset = { ...preset, game: { ...preset.game, variant } };
   void startPreview().then(() => stage?.openGameDirect(t === null ? undefined : Number(t)));
 }

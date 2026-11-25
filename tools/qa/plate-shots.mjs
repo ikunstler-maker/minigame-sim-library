@@ -4,7 +4,10 @@
 import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
-const [out, ...times] = process.argv.slice(2);
+const [out, ...rest] = process.argv.slice(2);
+// optional first arg like variant=code
+const extra = rest[0]?.includes('=') ? '&' + rest.shift() : '';
+const times = rest;
 mkdirSync(out, { recursive: true });
 const port = 9344;
 const chrome = spawn('C:/Program Files/Google/Chrome/Application/chrome.exe', [
@@ -35,7 +38,7 @@ console.log('connected'); await send('Runtime.enable');
 await send('Page.enable');
 
 for (const t of times) {
-  await send('Page.navigate', { url: `http://localhost:5173/?game&t=${t}` });
+  await send('Page.navigate', { url: `http://localhost:5173/?game&t=${t}${extra}` });
   console.log('nav', t);
   // wait until the plate is frozen on the frame and textures uploaded
   for (let i = 0; i < 100; i++) {

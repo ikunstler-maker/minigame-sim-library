@@ -142,7 +142,7 @@ export const DEFAULT_PRESET: Preset = {
   exitTapCount: 3,
   appOpenMs: 450,
   game: {
-    variant: 'plate',
+    variant: 'code',
     soundtrack: 'full',
     currency: { thousands: ',', decimal: '.', decimals: 2, prefix: '', suffix: '' },
     values: {},

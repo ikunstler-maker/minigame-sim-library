@@ -5,6 +5,7 @@ import { loadCatalog } from '../ios/iconCatalog';
 import { GameStub } from './GameStub';
 import { loadTexture } from './textures';
 import { PlateGame } from '../games/coin-volcano-plate/PlateGame';
+import { CodeGame } from '../games/coin-volcano-code/CodeGame';
 import { NumbersLayer, deriveTotals, type PatchText } from '../games/coin-volcano-plate/numbersLayer';
 import { loadGameFonts } from '../games/coin-volcano-plate/numbers/numberStyles';
 import { HomeScreen, ICON, type OpenRequest } from './ios/HomeScreen';
@@ -24,7 +25,7 @@ export class StageApp {
   private scenes = new Container();
   private statusLayer = new Container();
   private busy = false;
-  private gamePromise: Promise<PlateGame | null> | null = null;
+  private gamePromise: Promise<PlateGame | CodeGame | null> | null = null;
   private home: HomeScreen | null = null;
 
   constructor(private readonly preset: Preset, private readonly audio: AudioBus) {}
@@ -117,7 +118,7 @@ export class StageApp {
     home.visible = false;
     dim.visible = false;
     darkBar.visible = false;
-    if (content instanceof PlateGame) content.start();
+    if (content instanceof PlateGame || content instanceof CodeGame) content.start();
     this.busy = false;
   }
 
@@ -125,8 +126,9 @@ export class StageApp {
    * Load the plate game with its numbers. Returns null when the private plate files
    * are not on this build (e.g. the public site), so the placeholder is shown instead.
    */
-  private async loadGame(): Promise<PlateGame | null> {
+  private async loadGame(): Promise<PlateGame | CodeGame | null> {
     const g = this.preset.game;
+    if (g.variant === 'code') return this.loadCodeGame();
     if (g.variant !== 'plate') {
       this.home?.setGameProgress(1);
       return null;
@@ -166,6 +168,34 @@ export class StageApp {
     }
   }
 
+  /** Element-based variant: every symbol and number is our own element (no video under the board). */
+  private async loadCodeGame(): Promise<CodeGame | null> {
+    const g = this.preset.game;
+    try {
+      await loadGameFonts();
+      const base = './private/coin-volcano/';
+      const game = new CodeGame({
+        baseUrl: base,
+        audio: g.soundtrack === 'off' ? null : this.audio,
+        audioUrl: g.soundtrack === 'off' ? null : `${base}plate/${g.soundtrack === 'sfx' ? 'audio-sfx' : 'audio'}.m4a`,
+        ticker: this.app.ticker,
+        values: g.values,
+        currency: g.currency,
+        autoContinueMs: g.waitForTaps ? undefined : g.autoContinueMs,
+        onProgress: (p) => this.home?.setGameProgress(p),
+      });
+      await game.load();
+      game.onFinished = () => {
+        /* Stage 5: push notification and the user's layout page */
+      };
+      return game;
+    } catch (e) {
+      console.warn('Code game unavailable, showing placeholder:', e);
+      this.home?.setGameProgress(1);
+      return null;
+    }
+  }
+
   /**
    * Dev aid: open the game directly (no home screen) and, when `t` is given,
    * freeze on that video time. Used by `?game&t=12` for calibration.
@@ -177,7 +207,7 @@ export class StageApp {
     this.scenes.addChild(game);
     if (t === undefined) game.start();
     else await game.debugFreeze(t);
-    (window as unknown as { plate: PlateGame }).plate = game;
+    (window as unknown as { plate: PlateGame | CodeGame }).plate = game;
   }
 
   /** Tear down the renderer and all scenes. */

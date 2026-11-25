@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Coin Volcano FX test</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #111; overflow: hidden; color: #ddd; font: 13px system-ui, sans-serif; }
+    #bar { position: fixed; left: 0; right: 0; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+      padding: 6px; background: rgba(0,0,0,.75); }
+    #bar button { padding: 4px 8px; background: #422; color: #fec; border: 1px solid #a64; border-radius: 4px; cursor: pointer; }
+    #bar input[type=range] { width: 260px; }
+    #readout { font-family: ui-monospace, Consolas, monospace; color: #0f8; min-width: 70px; }
+    #stage-wrap { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+  <div id="bar">
+    <button id="play">Play</button>
+    <input id="time" type="range" min="0" max="10" step="0.01" value="0" />
+    <span id="readout">0.00 s</span>
+    <span id="buttons"></span>
+  </div>
+  <div id="stage-wrap"></div>
+  <script type="module" src="/src/games/coin-volcano-code/fx/fxTestPage.ts"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+{
+  "_comment": "Coin Volcano 'code' take. Scene clock = reference seconds (Assets/ref CV 1125.mp4, stage y = ref y - 3). Paths are relative to the game baseUrl (./private/coin-volcano/). Symbols reference value keys; numbers come from `values` (defaults = reference) and derived values computed in values.ts. Timings read from 10 fps contact sheets of the reference.",
+  "version": 1,
+  "duration": 38.7,
+  "media": {
+    "video": "plate/plate.mp4",
+    "audio": "plate/audio.m4a",
+    "layout": "code/layout.json",
+    "bigWinLabel": "plate/patches/sizzling-label.png",
+    "layers": {
+      "bgBase": "code/bg-base.png",
+      "bgBonus": "code/bg-bonus.png",
+      "spinButton": "code/spin-button.png",
+      "spinButtonBonus": "code/spin-button-bonus.png",
+      "totalBar": "code/total-bar.png",
+      "pips": "code/respin-pips.png",
+      "pipOff": "code/respin-pip-off.png"
+    }
+  },
+  "symbols": {
+    "gold": { "file": "code/symbols/sym1.png", "artR": 108, "text": "coin", "fallback": "0xf2b322" },
+    "mini": { "file": "code/symbols/sym2.png", "artR": 108, "text": "coin", "fallback": "0x2e9b3a" },
+    "minor": { "file": "code/symbols/sym3.png", "artR": 108, "text": "coin", "fallback": "0x2f5fd0" },
+    "major": { "file": "code/symbols/sym4.png", "artR": 108, "text": "coin", "fallback": "0x9b2fd0" },
+    "red": { "file": "code/symbols/sym5.png", "artR": 108, "text": "coin", "fallback": "0xd0301e" },
+    "mystery": { "file": "code/symbols/sym6.png", "artR": 121, "text": "coin", "fallback": "0x8a1a8a" },
+    "mysteryJackpot": { "file": "code/symbols/sym7.png", "artR": 121, "text": "coin", "fallback": "0x5a1aa0" },
+    "whirl": { "file": "code/symbols/sym8.png", "artR": 121, "drawR": 150, "text": "whirl", "fallback": "0xff5a10" }
+  },
+  "values": [
+    { "key": "jackpot:grand", "label": "GRAND jackpot", "default": 25000 },
+    { "key": "jackpot:major", "label": "MAJOR jackpot", "default": 2500 },
+    { "key": "jackpot:minor", "label": "MINOR jackpot", "default": 1000 },
+    { "key": "jackpot:mini", "label": "MINI jackpot", "default": 500 },
+    { "key": "bet:bet", "label": "Bet", "default": 0.2 },
+    { "key": "balance:start", "label": "Balance before the spin", "default": 10 },
+    { "key": "balance:afterSpin", "label": "Balance after the spin (before the win)", "default": 0 },
+    { "key": "coin-base:r0c2", "label": "Base coin top-right (before the spin)", "default": 200 },
+    { "key": "coin:r0c0", "label": "Coin row 1 left (respin)", "default": 100 },
+    { "key": "coin:r0c1", "label": "Coin row 1 middle", "default": 200 },
+    { "key": "coin:r0c2", "label": "Coin row 1 right (respin)", "default": 50 },
+    { "key": "coin:r1c0", "label": "Coin row 2 left", "default": 150 },
+    { "key": "coin:r1c1", "label": "Coin row 2 middle (under X multiplier)", "default": 50 },
+    { "key": "coin:r1c2", "label": "Red coin row 2 right", "default": 400 },
+    { "key": "coin:r2c1", "label": "Coin row 3 middle", "default": 100 },
+    { "key": "coin:r2c2", "label": "Coin Collect whirl final value", "default": 900 },
+    { "key": "multiplier", "label": "Multiplier", "default": 4, "decimals": 0 }
+  ],
+  "text": {
+    "coinHeight": 38,
+    "whirlHeight": 38,
+    "multiplierTemplate": "X{n}",
+    "multiplierKind": "bigwin",
+    "multiplierHeight": 92,
+    "spinCounterKind": "counter",
+    "spinCounterHeight": 34,
+    "fit": { "plate": 270, "bet": 92, "balance": 300, "coinFrac": 0.8, "barFrac": 0.62, "bigWinFrac": 0.86 }
+  },
+  "strip": {
+    "_comment": "Decorative symbols passing during a spin. Passing coin values = bet x betMultiples.",
+    "speed": 7,
+    "symbols": ["gold", "whirl", "gold", "red", "mystery", "gold", "minor", "gold", "mini", "whirl", "gold", "major", "gold", "red"],
+    "betMultiples": [250, 500, 750, 1000, 2000]
+  },
+  "bounce": { "dur": 0.2, "amp": 22 },
+  "holds": [
+    { "t": 0.9, "tap": "spin", "label": "spin" },
+    { "t": 9.6, "tap": "anywhere", "label": "bonus-start" }
+  ],
+  "inserts": [
+    { "_comment": "Sun-burst + BONUS GAME splash; dissolves into the red board 10.4-10.7.", "t0": 7.4, "t1": 10.4, "fadeIn": 0.1, "fadeOut": 0.3 },
+    { "_comment": "SIZZLING eruption + coin fountain.", "t0": 30.3, "t1": 38.7, "fadeIn": 0.1, "fadeOut": 0 }
+  ],
+  "boardSwitch": 8.9,
+  "boards": {
+    "base": {
+      "cells": {
+        "r0c0": [{ "t": 0, "sym": "minor" }, { "spin": [1.2, 1.55], "blank": true }],
+        "r0c1": [{ "spin": [1.25, 2.05], "land": { "sym": "gold", "value": "coin:r0c1" } }],
+        "r0c2": [{ "t": 0, "sym": "gold", "value": "coin-base:r0c2" }, { "spin": [1.2, 1.6], "blank": true }],
+        "r1c0": [{ "spin": [1.25, 2.3], "land": { "sym": "gold", "value": "coin:r1c0" } }],
+        "r1c1": [{ "spin": [1.25, 2.35] }, { "spin": [3.95, 4.2], "blank": true, "land": { "sym": "gold", "value": "coin:r1c1" } }],
+        "r1c2": [{ "t": 0, "sym": "red", "value": "coin:r1c2" }],
+        "r2c0": [{ "spin": [1.25, 3.95] }],
+        "r2c1": [{ "spin": [1.25, 4.45], "land": { "sym": "gold", "value": "coin:r2c1" } }],
+        "r2c2": [{ "spin": [1.25, 4.75], "land": { "sym": "whirl" } }]
+      },
+      "anticipation": [{ "cell": "r1c1", "t0": 2.35, "t1": 4.1 }],
+      "spinButtonRotate": [[1.1, 4.75]],
+      "trigger": { "t0": 5.4, "dur": 1.2, "cells": ["r0c1", "r1c0", "r1c1", "r1c2", "r2c1", "r2c2"] }
+    },
+    "bonus": {
+      "cells": {
+        "r0c0": [{ "spin": [16.05, 16.7] }, { "spin": [18.45, 19.1] }, { "spin": [20.25, 20.75], "land": { "sym": "gold", "value": "coin:r0c0" } }],
+        "r0c1": [{ "t": 0, "sym": "gold", "value": "coin:r0c1" }],
+        "r0c2": [{ "spin": [16.05, 16.75] }, { "spin": [18.45, 19.15] }, { "spin": [20.25, 20.85], "land": { "sym": "gold", "value": "coin:r0c2" } }],
+        "r1c0": [{ "t": 0, "sym": "gold", "value": "coin:r1c0" }],
+        "r1c1": [{ "t": 0, "sym": "gold", "value": "coin:r1c1" }],
+        "r1c2": [{ "t": 0, "sym": "red", "value": "coin:r1c2" }],
+        "r2c0": [{ "spin": [16.05, 16.8] }, { "spin": [18.45, 19.2] }, { "spin": [20.25, 20.9] }, { "spin": [21.0, 23.9] }],
+        "r2c1": [{ "t": 0, "sym": "gold", "value": "coin:r2c1" }],
+        "r2c2": [{ "t": 0, "sym": "whirl", "value": "whirl" }]
+      },
+      "anticipation": [{ "cell": "r2c0", "t0": 21.1, "t1": 23.9 }],
+      "spinButtonRotate": [[16.05, 16.8], [18.45, 19.2], [20.25, 20.9], [21.0, 23.9]],
+      "respinCounter": [
+        { "t": 0, "n": 3 }, { "t": 16.05, "n": 2 }, { "t": 18.45, "n": 1 }, { "t": 20.25, "n": 0 }, { "t": 20.9, "n": 3 }
+      ],
+      "pips": { "count": 3 }
+    }
+  },
+  "balance": [
+    { "t": 0, "value": "balance:start" },
+    { "t": 1.17, "value": "balance:afterBet" },
+    { "t": 30.8, "value": "balance:final" }
+  ],
+  "whirl": {
+    "cell": "r2c2",
+    "value": "coin:r2c2",
+    "activate": { "t": 11.3, "dur": 0.8 },
+    "trailDur": 0.5,
+    "collect": [
+      { "t": 12.4, "from": "r0c1", "value": "coin:r0c1" },
+      { "t": 13.3, "from": "r1c0", "value": "coin:r1c0" },
+      { "t": 13.7, "from": "r2c1", "value": "coin:r2c1" },
+      { "t": 14.1, "from": "r1c1", "value": "coin:r1c1" },
+      { "t": 15.2, "from": "r1c2", "value": "coin:r1c2" }
+    ]
+  },
+  "multiplier": {
+    "cell": "r1c1",
+    "value": "multiplier",
+    "t": 24.4,
+    "settle": 25.2,
+    "burst": 24.15,
+    "flash": { "t": 24.3, "dur": 0.9 },
+    "hideCoinValue": true
+  },
+  "dim": {
+    "global": [{ "t0": 23.7, "t1": 24.3, "to": 0.72 }, { "t0": 25.1, "t1": 25.4, "to": 1 }],
+    "collected": 0.32,
+    "collectedFade": 0.25
+  },
+  "collect": {
+    "bar": { "t0": 25.2, "t1": 30.4, "fade": 0.2 },
+    "trailDur": 0.45,
+    "order": [
+      { "cell": "r0c0", "t": 25.9, "value": "coin:r0c0" },
+      { "cell": "r0c1", "t": 26.5, "value": "coin:r0c1" },
+      { "cell": "r0c2", "t": 27.1, "value": "coin:r0c2" },
+      { "cell": "r1c0", "t": 27.4, "value": "coin:r1c0" },
+      { "cell": "r1c1", "t": 28.0, "value": "coin:r1c1" },
+      { "cell": "r1c2", "t": 28.6, "value": "coin:r1c2" },
+      { "cell": "r2c1", "t": 28.9, "value": "coin:r2c1" },
+      { "cell": "r2c2", "t": 29.5, "value": "coin:r2c2" }
+    ]
+  },
+  "bigWin": {
+    "_comment": "Count-up from bigwin x fromRatio (reference 338 / 7,800) to bigwin = total x multiplier.",
+    "t0": 30.9, "t1": 38.7, "fade": 0.1,
+    "countT0": 31.0, "countT1": 35.78, "fromRatio": 0.0433333,
+    "cx": 542, "cy": 1430, "height": 110,
+    "label": { "x": 218, "y": 1330, "w": 649, "h": 225 }
+  },
+  "glow": { "symbols": ["gold", "red", "mini", "minor", "major"], "scale": 1.2, "alpha": 0.55 },
+  "balanceBacking": { "w": 380, "h": 60, "color": "0x000000" }
+}

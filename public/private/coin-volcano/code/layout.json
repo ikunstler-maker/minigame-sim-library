@@ -1,0 +1,168 @@
+{
+ "stage": {
+  "w": 1080,
+  "h": 2340
+ },
+ "base": {
+  "cells": {
+   "x": [
+    217,
+    539,
+    862
+   ],
+   "y": [
+    679,
+    929,
+    1174
+   ]
+  },
+  "coinR": 140,
+  "plates": {
+   "grand": {
+    "cx": 206.0,
+    "cy": 343.0,
+    "height": 60
+   },
+   "major": {
+    "cx": 881.0,
+    "cy": 349.5,
+    "height": 53
+   },
+   "minor": {
+    "cx": 181.0,
+    "cy": 499.5,
+    "height": 53
+   },
+   "mini": {
+    "cx": 905.0,
+    "cy": 499.5,
+    "height": 47
+   }
+  },
+  "bet": {
+   "cx": 1029.0,
+   "cy": 1569.0,
+   "height": 44
+  },
+  "balance": {
+   "cx": 540.5,
+   "cy": 2002.5,
+   "height": 41
+  },
+  "win": {
+   "cx": 55.5,
+   "cy": 1569.0,
+   "height": 44,
+   "align": "left",
+   "left": 8,
+   "note": "estimated: mirror of the Bet slot; the reference never shows a win value"
+  },
+  "spin": {
+   "cx": 538.5,
+   "cy": 1619.5,
+   "r": 114
+  }
+ },
+ "bonus": {
+  "cells": {
+   "x": [
+    208,
+    541,
+    873
+   ],
+   "y": [
+    855,
+    1112,
+    1369
+   ]
+  },
+  "coinR": 140,
+  "plates": {
+   "grand": {
+    "cx": 206.0,
+    "cy": 512.5,
+    "height": 63
+   },
+   "major": {
+    "cx": 881.0,
+    "cy": 518.5,
+    "height": 51
+   },
+   "minor": {
+    "cx": 181.0,
+    "cy": 669.5,
+    "height": 49
+   },
+   "mini": {
+    "cx": 905.0,
+    "cy": 670.5,
+    "height": 45
+   }
+  },
+  "bet": {
+   "cx": 1029.0,
+   "cy": 1640.5,
+   "height": 39
+  },
+  "balance": {
+   "cx": 540.5,
+   "cy": 2002.5,
+   "height": 41
+  },
+  "win": {
+   "cx": 55.5,
+   "cy": 1640.5,
+   "height": 39,
+   "align": "left",
+   "left": 8,
+   "note": "estimated: mirror of the Bet slot; the reference never shows a win value"
+  },
+  "spin": {
+   "cx": 540.5,
+   "cy": 1695.5,
+   "r": 115
+  },
+  "totalBar": {
+   "x": 252,
+   "y": 1397,
+   "w": 576,
+   "h": 110,
+   "textCx": 544.5,
+   "textCy": 1454.0,
+   "textHeight": 48
+  },
+  "pips": {
+   "x": 347,
+   "y": 1442,
+   "w": 383,
+   "h": 67
+  }
+ },
+ "spinFiles": {
+  "base": {
+   "file": "spin-button.png",
+   "x": 420,
+   "y": 1502,
+   "size": 237,
+   "cx": 538.5,
+   "cy": 1619.5,
+   "r": 114
+  },
+  "bonus": {
+   "file": "spin-button-bonus.png",
+   "x": 421,
+   "y": 1577,
+   "size": 239,
+   "cx": 540.5,
+   "cy": 1695.5,
+   "r": 115
+  }
+ },
+ "pipFiles": {
+  "strip": "respin-pips.png",
+  "on": "respin-pip-on.png",
+  "off": "respin-pip-off.png",
+  "pipW": 129,
+  "note": "strip = all three pips orange (full); off = dark pip (used)"
+ }
+}
