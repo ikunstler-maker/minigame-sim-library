@@ -8,6 +8,8 @@ import { CodeGame } from './coin-volcano-code/CodeGame';
 import { PlateGame } from './coin-volcano-plate/PlateGame';
 import { NumbersLayer, deriveTotals, type PatchText } from './coin-volcano-plate/numbersLayer';
 import { loadGameFonts } from './coin-volcano-plate/numbers/numberStyles';
+import { resolveValues } from './coin-volcano-code/values';
+import { fillTemplate } from '../money';
 
 export type AnyGame = PlateGame | CodeGame;
 
@@ -72,9 +74,40 @@ export async function createGame(preset: Preset, o: CreateGameOptions): Promise<
   }
 }
 
+/** Numbers of one take used by the notification and the page. */
+export interface TakeValues {
+  win: number;
+  start: number;
+  balance: number;
+  id: string;
+}
+
+/**
+ * The big win of the configured take (code: total x multiplier from script.json;
+ * plate: the SIZZLING count) and the wallet balance after it.
+ */
+export async function takeValues(preset: Preset, id: string): Promise<TakeValues> {
+  let win = 7800;
+  try {
+    if (preset.game.variant === 'code') {
+      const script = await fetch('./private/coin-volcano/code/script.json').then((r) => r.json());
+      win = resolveValues(script, preset.game.values).bigwin ?? win;
+    } else {
+      const json = await fetch('./private/coin-volcano/plate/patches.json').then((r) => r.json());
+      const items = Array.isArray(json) ? json : (json.items ?? []);
+      win = deriveTotals(items, preset.game.values)['counter:sizzling:to'] ?? win;
+    }
+  } catch {
+    /* game files missing: keep the reference win */
+  }
+  const start = preset.push.startBalance;
+  return { win, start, balance: start + win, id };
+}
+
 /** Build the end-of-take notification banner from the preset (not yet shown). */
-export async function createPushBanner(preset: Preset): Promise<NotificationBanner> {
+export async function createPushBanner(preset: Preset, v: TakeValues): Promise<NotificationBanner> {
   const p = preset.push;
   const url = p.iconId === 'custom' ? (p.customSrc ?? '') : slotUrl({ iconId: p.iconId, label: '', role: 'app' }, await loadCatalog());
-  return new NotificationBanner(p, await loadTexture(url));
+  const filled = { ...p, title: fillTemplate(p.title, v, preset.region), body: fillTemplate(p.body, v, preset.region) };
+  return new NotificationBanner(filled, await loadTexture(url));
 }

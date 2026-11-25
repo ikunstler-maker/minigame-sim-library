@@ -1,12 +1,14 @@
 import { Application, Container, Graphics } from 'pixi.js';
 import { GRID_COLS, GRID_ROWS, PT, STAGE_H, STAGE_W, type Preset } from '../config';
-import { createGame, createPushBanner, type AnyGame } from '../games/createGame';
+import { createGame, createPushBanner, takeValues, type AnyGame } from '../games/createGame';
+import { PageScene } from '../stage/PageScene';
+import { randomId } from '../money';
 import { loadCatalog } from '../ios/iconCatalog';
 import { HomeScreen, ICON, cellPos } from '../stage/ios/HomeScreen';
 import { StatusBar } from '../stage/ios/StatusBar';
 import { WIDGET_H, WIDGET_W } from '../stage/ios/WeatherWidget';
 
-export type LiveScene = 'home' | 'game' | 'push';
+export type LiveScene = 'home' | 'game' | 'push' | 'page';
 
 /** What a tap on the phone mock points at. */
 export interface Pick {
@@ -57,6 +59,8 @@ export class LivePreview {
   private building: Promise<void> | null = null;
   private layout: { base: PlateLayout; bonus: PlateLayout } | null = null;
   private status = '';
+  /** Stable {id} while editing (a new one is drawn for every recorded take). */
+  private readonly takeId = randomId();
 
   /** Fired when the mock is tapped on an editable element. */
   onPick: (p: Pick) => void = () => {};
@@ -116,6 +120,18 @@ export class LivePreview {
     if (!this.preset) return;
     const run = async () => {
       this.root.removeChildren();
+      if (this.scene === 'page') {
+        this.setStatus('');
+        const v = await takeValues(this.preset, this.takeId);
+        const page = await PageScene.create(this.preset.page, v, this.preset.region);
+        this.root.addChild(page, new StatusBar({ ...this.preset.statusBar, style: 'light' }));
+        this.regions = [
+          { x: 0, y: 0, w: STAGE_W, h: STAGE_H, section: 'sec-page', field: 'page.background', label: 'Page background' },
+          ...page.blockRects.map((r) => ({ ...r, section: 'sec-page', field: `page.blocks.${r.index}.text`, label: `Block ${r.index + 1}` })),
+        ];
+        if (!this.preset.page.enabled) page.alpha = 0.35;
+        return;
+      }
       if (this.scene === 'home') {
         this.setStatus('');
         const home = await HomeScreen.create(this.preset, await loadCatalog());
@@ -134,7 +150,7 @@ export class LivePreview {
       await game.debugFreeze(t);
       this.regions = this.gameRegions(t);
       if (this.scene === 'push') {
-        const banner = await createPushBanner(this.preset);
+        const banner = await createPushBanner(this.preset, await takeValues(this.preset, this.takeId));
         banner.placeShown();
         this.root.addChild(banner);
         const b = banner.getBounds();
@@ -252,6 +268,7 @@ export class LivePreview {
     if (hint.startsWith('statusBar.')) found = this.regions.filter((r) => r.section === 'sec-status');
     else if (hint.startsWith('weather.')) found = this.regions.filter((r) => r.section === 'sec-weather');
     else if (hint.startsWith('push.')) found = this.regions.filter((r) => r.section === 'sec-push');
+    else if (hint.startsWith('page.') || hint.startsWith('region.')) found = this.regions.filter((r) => r.field === hint || (r.section === 'sec-page' && r.field !== 'page.background'));
     else if (hint.startsWith('game.currency')) found = this.regions.filter((r) => r.field?.includes(':'));
     else found = this.regions.filter((r) => r.field === hint);
     for (const r of found) this.outline(r);

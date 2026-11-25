@@ -80,6 +80,45 @@ export interface PushConfig {
   /** Delay after the game ends, ms. */
   delayMs: number;
   style: 'light' | 'dark';
+  /**
+   * Balance before the win in the game's virtual wallet; {balance} = this + win.
+   * Title and body may use {win} {balance} {start} {id} {currency}.
+   */
+  startBalance: number;
+}
+
+export type PageBlockKind = 'text' | 'image' | 'amount';
+
+/** One element on the page opened from the notification. Positions in % of the screen. */
+export interface PageBlock {
+  kind: PageBlockKind;
+  /** Centre, % of width / height. */
+  x: number;
+  y: number;
+  /** Text (templates allowed) for text blocks. Amount blocks show {balance}. */
+  text: string;
+  /** Font size in pt (text, amount) or width in % (image). */
+  size: number;
+  color: string;
+  weight: '400' | '600' | '800';
+  align: 'left' | 'center' | 'right';
+  /** Data URL for image blocks. */
+  imageSrc?: string;
+}
+
+/** The page (game wallet screen) opened by tapping the notification. */
+export interface PageConfig {
+  enabled: boolean;
+  background: string;
+  /** Data URL of a full-screen background image (cover). */
+  backgroundImage?: string;
+  /** How the amount changes from {start} to {balance}. */
+  amountAnim: 'counter' | 'spinner' | 'pull';
+  /** Delay before the amount changes, ms. */
+  amountDelayMs: number;
+  /** Duration of the change, ms. */
+  amountDurationMs: number;
+  blocks: PageBlock[];
 }
 
 export interface GameConfig {
@@ -121,6 +160,9 @@ export interface Preset {
   appOpenMs: number;
   game: GameConfig;
   push: PushConfig;
+  page: PageConfig;
+  /** Country number format and currency, used by the notification and the page. */
+  region: { locale: string; currency: string };
 }
 
 /** Logical stage size: iPhone portrait (19.5:9). */
@@ -166,10 +208,25 @@ export const DEFAULT_PRESET: Preset = {
     enabled: true,
     iconId: 'coin-volcano',
     title: 'Coin Volcano',
-    body: 'Your win is waiting! Tap to collect it.',
+    body: 'Big win! +{win} added. Balance: {balance}',
     timeLabel: 'now',
     delayMs: 900,
     style: 'light',
+    startBalance: 1000,
+  },
+  region: { locale: 'en-AU', currency: 'AUD' },
+  page: {
+    enabled: true,
+    background: '#14161c',
+    amountAnim: 'counter',
+    amountDelayMs: 600,
+    amountDurationMs: 1600,
+    blocks: [
+      { kind: 'text', x: 50, y: 13, text: 'Coin Volcano Wallet', size: 22, color: '#ffffff', weight: '800', align: 'center' },
+      { kind: 'text', x: 50, y: 24, text: 'Balance', size: 15, color: '#9aa0aa', weight: '600', align: 'center' },
+      { kind: 'amount', x: 50, y: 30, text: '{balance}', size: 40, color: '#ffffff', weight: '800', align: 'center' },
+      { kind: 'text', x: 50, y: 38, text: '+{win} from Coin Volcano', size: 16, color: '#ffb02e', weight: '600', align: 'center' },
+    ],
   },
   game: {
     variant: 'code',

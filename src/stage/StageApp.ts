@@ -1,8 +1,10 @@
-import { Application, Container, Graphics, Sprite } from 'pixi.js';
+import { Application, Container, Graphics, Sprite, type Ticker } from 'pixi.js';
 import { PT, STAGE_H, STAGE_W, type Preset } from '../config';
 import type { AudioBus } from '../audio/AudioBus';
 import { loadCatalog } from '../ios/iconCatalog';
-import { createGame, createPushBanner, type AnyGame } from '../games/createGame';
+import { createGame, createPushBanner, takeValues, type AnyGame, type TakeValues } from '../games/createGame';
+import { PageScene } from './PageScene';
+import { randomId } from '../money';
 import { GameStub } from './GameStub';
 import { PlateGame } from '../games/coin-volcano-plate/PlateGame';
 import { CodeGame } from '../games/coin-volcano-code/CodeGame';
@@ -23,6 +25,8 @@ export class StageApp {
   private scenes = new Container();
   private statusLayer = new Container();
   private busy = false;
+  /** New random number for {id} in every take. */
+  private readonly takeId = randomId();
   private gamePromise: Promise<AnyGame | null> | null = null;
   private home: HomeScreen | null = null;
 
@@ -160,9 +164,48 @@ export class StageApp {
 
   private async showPush(): Promise<void> {
     if (this.app.renderer === null) return;
-    const banner = await createPushBanner(this.preset);
+    const v = await takeValues(this.preset, this.takeId);
+    const banner = await createPushBanner(this.preset, v);
     this.statusLayer.addChild(banner);
+    banner.eventMode = 'static';
+    banner.cursor = 'pointer';
+    banner.once('pointertap', () => void this.openPage(banner, v));
     await banner.show(this.app.ticker);
+  }
+
+  /** Dev aid: open the page as if the notification was tapped (`?game&t=38.5&page`). */
+  async debugOpenPage(): Promise<void> {
+    const v = await takeValues(this.preset, this.takeId);
+    const banner = await createPushBanner(this.preset, v);
+    banner.placeShown();
+    this.statusLayer.addChild(banner);
+    await this.openPage(banner, v);
+  }
+
+  /** Tap on the notification: the page grows out of the banner, then the amount animates. */
+  private async openPage(banner: Container, v: TakeValues): Promise<void> {
+    if (!this.preset.page.enabled) return;
+    const page = await PageScene.create(this.preset.page, v, this.preset.region);
+    const b = banner.getBounds();
+    const mask = new Graphics();
+    page.mask = mask;
+    this.scenes.addChild(page, mask);
+    const lerp = (a: number, c: number, k: number) => a + (c - a) * k;
+    page.setTime(0);
+    await tween(this.app.ticker, 420, (k) => {
+      const x = lerp(b.x, 0, k), y = lerp(b.y, 0, k), w = lerp(b.width, STAGE_W, k), h = lerp(b.height, STAGE_H, k);
+      mask.clear().roundRect(x, y, w, h, lerp(24 * PT, 55 * PT, k)).fill(0xffffff);
+      banner.alpha = 1 - k;
+    }, easeOutCubic);
+    page.mask = null;
+    mask.destroy();
+    banner.destroy();
+    let ms = 0;
+    const tick = (t: Ticker) => {
+      ms += t.deltaMS;
+      page.setTime(ms);
+    };
+    this.app.ticker.add(tick);
   }
 
   /** Tear down the renderer and all scenes. */

@@ -119,3 +119,10 @@ textarea { font: inherit; font-size: 16px; padding: 6px; background: #1b1b1f; co
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 #ffd23a; background: #ffd23a33; } 100% { box-shadow: 0 0 0 10px #ffd23a00; background: transparent; } }
 .pulse { animation: pulse 1.2s ease-out; border-radius: 10px; }
 
+
+.block-row { border: 1px solid #2a2a30; border-radius: 12px; padding: 10px; display: grid; gap: 8px; margin-bottom: 10px; }
+.block-head { display: flex; justify-content: space-between; align-items: center; }
+.block-head button { flex: none; padding: 4px 10px; }
+.block-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px 12px; }
+.block-grid label { font-size: 13px; }
+.block-grid input[type=number] { width: 64px; }

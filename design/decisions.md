@@ -13,6 +13,13 @@ Replaced by: a game push (custom text/icon) that opens a blank layout page the u
 assembles in Studio (own background, image/text blocks, amount field with
 animation modes: counter / spinner → instant / pull-to-refresh).
 
+**Update 2026-11-25 (Stage 5):** the notification and the page are the game's own
+virtual-money wallet (user: "internal interface for virtual money, design not
+finished"). Templates fill {win} (game big win), {balance} (wallet balance before +
+win), {start}, {id} (random per take), {currency}; amounts follow Region & currency
+(Intl). Defaults are game-branded. No bank templates, card wording or bank logos
+are shipped by the app.
+
 ## D3. Stack
 Vite + TypeScript + PixiJS v8. Studio = plain HTML/TS panel (no React).
 Preview = one PixiJS canvas, 1080x1920 logical portrait space.

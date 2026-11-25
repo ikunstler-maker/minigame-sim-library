@@ -1,5 +1,5 @@
 import './style.css';
-import { STAGE_H, STAGE_W, loadPreset, resetPreset, savePreset, type Preset, type WeatherCondition } from './config';
+import { STAGE_H, STAGE_W, loadPreset, resetPreset, savePreset, type PageBlockKind, type Preset, type WeatherCondition } from './config';
 import { AudioBus } from './audio/AudioBus';
 import { CanvasRecorder, pickMimeType, type Recording } from './recorder/CanvasRecorder';
 import { StageApp } from './stage/StageApp';
@@ -7,7 +7,8 @@ import { HomeEditor } from './studio/HomeEditor';
 import { loadCatalog } from './ios/iconCatalog';
 import { itemText, valueKey, type PatchText } from './games/coin-volcano-plate/numbersLayer';
 import { editableValues } from './games/coin-volcano-code/values';
-import { fileToIcon, pickImage } from './studio/images';
+import { fileToIcon, fileToWallpaper, pickImage } from './studio/images';
+import { CURRENCIES, LOCALES, formatCurrency, separatorsFor } from './money';
 import { LivePreview, type LiveScene, type Pick } from './studio/LivePreview';
 
 const studioEl = document.getElementById('studio')!;
@@ -104,9 +105,29 @@ async function renderStudio(): Promise<void> {
       <div class="push-icon"><img id="push-icon-img" alt=""><select id="push-icon-sel"></select><button id="push-icon-up">Upload…</button></div>
       ${text('push.title', 'Title')}
       <label>Text <textarea data-path="push.body" rows="3">${attr(preset.push.body)}</textarea></label>
+      ${num('push.startBalance', 'Wallet balance before the win', 0)}
+      <p class="note">Auto-filled: <b>{win}</b> big win from the game settings · <b>{balance}</b> = balance before + win · <b>{start}</b> balance before · <b>{id}</b> new random 4 digits in every take · <b>{currency}</b> sign. Amounts follow Region &amp; currency.</p>
       ${text('push.timeLabel', 'Time label')}
       ${num('push.delayMs', 'Delay after the win (ms)', 0, 10000)}
       ${select('push.style', 'Style', ['light', 'dark'])}
+    </section></details>
+
+    <details id="sec-region"><summary>Region &amp; currency</summary><section>
+      <label>Country format <select id="region-locale">${LOCALES.map((l) => `<option value="${l.id}" ${l.id === preset.region.locale ? 'selected' : ''}>${l.label}</option>`).join('')}</select></label>
+      <label>Currency <select id="region-currency">${CURRENCIES.map((c) => `<option ${c === preset.region.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+      <p class="note">Example: <b id="region-example"></b>. Game numbers use the same separators.</p>
+    </section></details>
+
+    <details id="sec-page"><summary>Page after tapping the notification</summary><section>
+      ${check('page.enabled', 'Open the page when the notification is tapped')}
+      ${color('page.background', 'Background colour')}
+      <div class="row"><button id="page-bg-up">Background image…</button><button id="page-bg-clear">No image</button></div>
+      ${select('page.amountAnim', 'Amount change', ['counter', 'spinner', 'pull'])}
+      <p class="note">counter = counts up · spinner = loader, then the new number · pull = pull-to-refresh, then the new number</p>
+      ${num('page.amountDelayMs', 'Start after (ms)', 0, 10000)}
+      ${num('page.amountDurationMs', 'Duration (ms)', 100, 10000)}
+      <div id="page-blocks">${pageBlocksHtml()}</div>
+      <div class="row"><button data-add="text">+ Text</button><button data-add="amount">+ Amount</button><button data-add="image">+ Image</button></div>
     </section></details>
 
     <details id="sec-status"><summary>Status bar</summary><section>
@@ -157,6 +178,7 @@ async function renderStudio(): Promise<void> {
           <button data-scene="home">Home screen</button>
           <button data-scene="game">Game</button>
           <button data-scene="push">Notification</button>
+          <button data-scene="page">Page</button>
         </div>
         <div class="live-time" hidden>
           <input id="live-t" type="range" min="0" max="38.6" step="0.1" value="${liveTime}">
@@ -170,6 +192,7 @@ async function renderStudio(): Promise<void> {
   `;
 
   void bindPushIcon();
+  bindRegionAndPage();
   studioEl.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[data-path]').forEach((el) => {
     el.addEventListener('change', () => {
       const p = structuredClone(preset);
@@ -249,12 +272,95 @@ async function focusPick(pk: Pick): Promise<void> {
   const field = pk.field
     ? sec.querySelector<HTMLElement>(`[data-value-key="${CSS.escape(pk.field)}"], [data-path="${CSS.escape(pk.field)}"]`)
     : null;
-  const target = (field?.closest('label') as HTMLElement | null) ?? sec;
+  const block = pk.field?.match(/^page\.blocks\.(\d+)\./);
+  const target = block ? (document.getElementById(`block-${block[1]}`) ?? sec) : ((field?.closest('label') as HTMLElement | null) ?? sec);
   target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   target.classList.remove('pulse');
   void target.offsetWidth;
   target.classList.add('pulse');
   if (field instanceof HTMLInputElement) setTimeout(() => field.focus({ preventScroll: true }), 350);
+}
+
+/** Editor rows for the page blocks (data-path bound like every other field). */
+function pageBlocksHtml(): string {
+  return preset.page.blocks
+    .map((b, i) => {
+      const P = `page.blocks.${i}`;
+      const content =
+        b.kind === 'image'
+          ? `<button data-block-img="${i}">${b.imageSrc ? 'Change image…' : 'Choose image…'}</button>`
+          : `<label>${b.kind === 'amount' ? 'Amount' : 'Text'} <input data-path="${P}.text" value="${attr(b.text)}" ${b.kind === 'amount' ? 'disabled' : ''}></label>`;
+      const style = b.kind === 'image' ? '' : color(`${P}.color`, 'Colour') + select(`${P}.weight`, 'Weight', ['400', '600', '800']) + select(`${P}.align`, 'Align', ['left', 'center', 'right']);
+      return `<div class="block-row" id="block-${i}">
+        <div class="block-head"><b>${i + 1}. ${b.kind}</b><button data-del="${i}" title="Delete">✕</button></div>
+        ${content}
+        <div class="block-grid">
+          ${num(`${P}.x`, 'X %', 0, 100)}${num(`${P}.y`, 'Y %', 0, 100)}${num(`${P}.size`, b.kind === 'image' ? 'Width %' : 'Size pt', 1, 200)}
+          ${style}
+        </div>
+      </div>`;
+    })
+    .join('');
+}
+
+function bindRegionAndPage(): void {
+  const loc = document.getElementById('region-locale') as HTMLSelectElement;
+  const cur = document.getElementById('region-currency') as HTMLSelectElement;
+  const ex = document.getElementById('region-example')!;
+  const showEx = () => (ex.textContent = formatCurrency(7800, preset.region));
+  showEx();
+  const onRegion = () => {
+    const p = structuredClone(preset);
+    p.region = { locale: loc.value, currency: cur.value };
+    p.game.currency = { ...p.game.currency, ...separatorsFor(p.region) };
+    commit(p, 'region.');
+    showEx();
+  };
+  loc.addEventListener('change', onRegion);
+  cur.addEventListener('change', onRegion);
+
+  document.getElementById('page-bg-up')!.addEventListener('click', async () => {
+    const f = await pickImage();
+    if (!f) return;
+    const p = structuredClone(preset);
+    p.page.backgroundImage = await fileToWallpaper(f);
+    commit(p, 'page.background');
+  });
+  document.getElementById('page-bg-clear')!.addEventListener('click', () => {
+    const p = structuredClone(preset);
+    delete p.page.backgroundImage;
+    commit(p, 'page.background');
+  });
+  document.querySelectorAll<HTMLButtonElement>('[data-add]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const p = structuredClone(preset);
+      const kind = b.dataset.add as PageBlockKind;
+      p.page.blocks.push({
+        kind, x: 50, y: 50, text: kind === 'amount' ? '{balance}' : 'New text', size: kind === 'image' ? 40 : 18,
+        color: '#ffffff', weight: kind === 'amount' ? '800' : '600', align: 'center',
+      });
+      commit(p, `page.blocks.${p.page.blocks.length - 1}.text`);
+      void renderStudio();
+    }),
+  );
+  document.querySelectorAll<HTMLButtonElement>('[data-del]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const p = structuredClone(preset);
+      p.page.blocks.splice(Number(b.dataset.del), 1);
+      commit(p, 'page.');
+      void renderStudio();
+    }),
+  );
+  document.querySelectorAll<HTMLButtonElement>('[data-block-img]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      const f = await pickImage();
+      if (!f) return;
+      const p = structuredClone(preset);
+      p.page.blocks[Number(b.dataset.blockImg)].imageSrc = await fileToWallpaper(f);
+      commit(p, `page.blocks.${b.dataset.blockImg}.text`);
+      void renderStudio();
+    }),
+  );
 }
 
 /** Notification icon: pick from the icon collection or upload a PNG. */
@@ -470,5 +576,5 @@ if (qs.has('game')) {
   if (qs.has('auto')) preset = { ...preset, game: { ...preset.game, manualSpin: false } };
   void startPreview()
     .then(() => stage?.openGameDirect(t === null ? undefined : Number(t)))
-    .then(() => (qs.has('push') ? stage?.debugShowPush() : undefined));
+    .then(() => (qs.has('page') ? stage?.debugOpenPage() : qs.has('push') ? stage?.debugShowPush() : undefined));
 }
