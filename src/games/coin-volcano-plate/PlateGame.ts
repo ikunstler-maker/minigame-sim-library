@@ -46,6 +46,8 @@ export interface PlateGameOptions {
   ticker?: Ticker;
   /** Attach `update` to the ticker automatically (default true). Set false to call `update(dtMs)` yourself. */
   autoTick?: boolean;
+  /** Video download progress 0..1 (the plate is loaded whole before play). */
+  onProgress?: (p: number) => void;
   /** Draw the active tap area (dev aid). Default false. */
   showTapAreas?: boolean;
   /** Audio/video drift that triggers an audio re-sync, seconds. Default 0.08. */
@@ -87,7 +89,7 @@ export class PlateGame extends Container implements GamePlugin {
     super({ label: 'plate-game' });
     this.opts = opts;
     this.base = opts.baseUrl ?? DEFAULT_BASE;
-    this.video = new PlateVideo(opts.videoUrl ?? this.base + 'plate.mp4');
+    this.video = new PlateVideo(opts.videoUrl ?? this.base + 'plate.mp4', opts.onProgress);
     const audioUrl = opts.audioUrl === undefined ? this.base + 'audio.m4a' : opts.audioUrl;
     this.sound = new PlateAudio(opts.audio ?? null, audioUrl);
 

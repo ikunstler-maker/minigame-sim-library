@@ -1,0 +1,1975 @@
+{
+ "video": {
+  "width": 1080,
+  "height": 2340,
+  "fps": 30,
+  "cropTop": 3
+ },
+ "items": [
+  {
+   "id": "jp-grand-base",
+   "t0": 0.0,
+   "t1": 7.8,
+   "x": 46,
+   "y": 313,
+   "w": 320,
+   "h": 63,
+   "patch": "patches/jp-grand-base.png",
+   "fadeIn": 0.0,
+   "fadeOut": 0.4,
+   "track": [],
+   "text": {
+    "kind": "jackpot",
+    "key": "grand",
+    "ref": "25,000.00",
+    "cx": 206.0,
+    "cy": 343.0,
+    "height": 60
+   }
+  },
+  {
+   "id": "jp-major-base",
+   "t0": 0.0,
+   "t1": 7.8,
+   "x": 732,
+   "y": 315,
+   "w": 298,
+   "h": 61,
+   "patch": "patches/jp-major-base.png",
+   "fadeIn": 0.0,
+   "fadeOut": 0.4,
+   "track": [],
+   "text": {
+    "kind": "jackpot",
+    "key": "major",
+    "ref": "2,500.00",
+    "cx": 881.0,
+    "cy": 349.5,
+    "height": 53
+   }
+  },
+  {
+   "id": "jp-minor-base",
+   "t0": 0.0,
+   "t1": 7.8,
+   "x": 50,
+   "y": 473,
+   "w": 262,
+   "h": 53,
+   "patch": "patches/jp-minor-base.png",
+   "fadeIn": 0.0,
+   "fadeOut": 0.4,
+   "track": [],
+   "text": {
+    "kind": "jackpot",
+    "key": "minor",
+    "ref": "1,000.00",
+    "cx": 181.0,
+    "cy": 499.5,
+    "height": 53
+   }
+  },
+  {
+   "id": "jp-mini-base",
+   "t0": 0.0,
+   "t1": 7.8,
+   "x": 780,
+   "y": 473,
+   "w": 250,
+   "h": 53,
+   "patch": "patches/jp-mini-base.png",
+   "fadeIn": 0.0,
+   "fadeOut": 0.4,
+   "track": [],
+   "text": {
+    "kind": "jackpot",
+    "key": "mini",
+    "ref": "500.00",
+    "cx": 905.0,
+    "cy": 499.5,
+    "height": 47
+   }
+  },
+  {
+   "id": "jp-grand-bonus",
+   "t0": 10.4,
+   "t1": 30.65,
+   "x": 46,
+   "y": 481,
+   "w": 320,
+   "h": 63,
+   "patch": "patches/jp-grand-bonus.png",
+   "fadeIn": 0.4,
+   "fadeOut": 0.05,
+   "track": [
+    {
+     "t": 20.55,
+     "x": 46,
+     "y": 481,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 20.6,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 20.63,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 20.67,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 20.7,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 20.73,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 20.77,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 20.8,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 20.83,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 20.87,
+     "x": 44.16,
+     "y": 480.76,
+     "scale": 1.01,
+     "alpha": 1
+    },
+    {
+     "t": 20.9,
+     "x": 44.16,
+     "y": 480.76,
+     "scale": 1.01,
+     "alpha": 1
+    },
+    {
+     "t": 20.93,
+     "x": 39.64,
+     "y": 481.04,
+     "scale": 1.04,
+     "alpha": 1
+    },
+    {
+     "t": 20.97,
+     "x": 35.12,
+     "y": 480.32,
+     "scale": 1.07,
+     "alpha": 1
+    },
+    {
+     "t": 21.0,
+     "x": 31.44,
+     "y": 479.84,
+     "scale": 1.09,
+     "alpha": 1
+    },
+    {
+     "t": 21.03,
+     "x": 26.92,
+     "y": 480.12,
+     "scale": 1.12,
+     "alpha": 1
+    },
+    {
+     "t": 21.07,
+     "x": 25.08,
+     "y": 479.88,
+     "scale": 1.13,
+     "alpha": 1
+    },
+    {
+     "t": 21.1,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 21.13,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 21.17,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 21.2,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 21.23,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 21.27,
+     "x": 23.24,
+     "y": 479.64,
+     "scale": 1.14,
+     "alpha": 1
+    },
+    {
+     "t": 21.3,
+     "x": 25.08,
+     "y": 479.88,
+     "scale": 1.13,
+     "alpha": 1
+    },
+    {
+     "t": 21.33,
+     "x": 28.76,
+     "y": 480.36,
+     "scale": 1.11,
+     "alpha": 1
+    },
+    {
+     "t": 21.37,
+     "x": 33.28,
+     "y": 480.08,
+     "scale": 1.08,
+     "alpha": 1
+    },
+    {
+     "t": 21.4,
+     "x": 39.64,
+     "y": 480.04,
+     "scale": 1.04,
+     "alpha": 1
+    },
+    {
+     "t": 21.43,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 21.47,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 21.5,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 21.53,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 21.57,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 21.6,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 21.63,
+     "x": 47.84,
+     "y": 481.24,
+     "scale": 0.99,
+     "alpha": 1
+    },
+    {
+     "t": 21.67,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 21.7,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 21.73,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 21.77,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 21.8,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 21.83,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 21.87,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 21.9,
+     "x": 44.16,
+     "y": 480.76,
+     "scale": 1.01,
+     "alpha": 1
+    },
+    {
+     "t": 21.93,
+     "x": 37.8,
+     "y": 480.8,
+     "scale": 1.05,
+     "alpha": 1
+    },
+    {
+     "t": 21.97,
+     "x": 35.12,
+     "y": 480.32,
+     "scale": 1.07,
+     "alpha": 1
+    },
+    {
+     "t": 22.0,
+     "x": 30.6,
+     "y": 480.6,
+     "scale": 1.1,
+     "alpha": 1
+    },
+    {
+     "t": 22.03,
+     "x": 28.76,
+     "y": 480.36,
+     "scale": 1.11,
+     "alpha": 1
+    },
+    {
+     "t": 22.07,
+     "x": 23.24,
+     "y": 479.64,
+     "scale": 1.14,
+     "alpha": 1
+    },
+    {
+     "t": 22.1,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 22.13,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 22.17,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 22.2,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 22.23,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 22.27,
+     "x": 23.24,
+     "y": 480.64,
+     "scale": 1.14,
+     "alpha": 1
+    },
+    {
+     "t": 22.3,
+     "x": 25.08,
+     "y": 479.88,
+     "scale": 1.13,
+     "alpha": 1
+    },
+    {
+     "t": 22.33,
+     "x": 31.44,
+     "y": 479.84,
+     "scale": 1.09,
+     "alpha": 1
+    },
+    {
+     "t": 22.37,
+     "x": 33.28,
+     "y": 480.08,
+     "scale": 1.08,
+     "alpha": 1
+    },
+    {
+     "t": 22.4,
+     "x": 39.64,
+     "y": 480.04,
+     "scale": 1.04,
+     "alpha": 1
+    },
+    {
+     "t": 22.43,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 22.47,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 22.5,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 22.53,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 22.57,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 22.6,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 22.63,
+     "x": 47.84,
+     "y": 481.24,
+     "scale": 0.99,
+     "alpha": 1
+    },
+    {
+     "t": 22.67,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 22.7,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 22.73,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 22.77,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 22.8,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 22.83,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 22.87,
+     "x": 44.16,
+     "y": 480.76,
+     "scale": 1.01,
+     "alpha": 1
+    },
+    {
+     "t": 22.9,
+     "x": 41.48,
+     "y": 481.28,
+     "scale": 1.03,
+     "alpha": 1
+    },
+    {
+     "t": 22.93,
+     "x": 37.8,
+     "y": 480.8,
+     "scale": 1.05,
+     "alpha": 1
+    },
+    {
+     "t": 22.97,
+     "x": 35.12,
+     "y": 480.32,
+     "scale": 1.07,
+     "alpha": 1
+    },
+    {
+     "t": 23.0,
+     "x": 30.6,
+     "y": 480.6,
+     "scale": 1.1,
+     "alpha": 1
+    },
+    {
+     "t": 23.03,
+     "x": 26.92,
+     "y": 480.12,
+     "scale": 1.12,
+     "alpha": 1
+    },
+    {
+     "t": 23.07,
+     "x": 23.24,
+     "y": 479.64,
+     "scale": 1.14,
+     "alpha": 1
+    },
+    {
+     "t": 23.1,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 23.13,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 23.17,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 23.2,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 23.23,
+     "x": 22.4,
+     "y": 480.4,
+     "scale": 1.15,
+     "alpha": 1
+    },
+    {
+     "t": 23.27,
+     "x": 23.24,
+     "y": 480.64,
+     "scale": 1.14,
+     "alpha": 1
+    },
+    {
+     "t": 23.3,
+     "x": 25.08,
+     "y": 479.88,
+     "scale": 1.13,
+     "alpha": 1
+    },
+    {
+     "t": 23.33,
+     "x": 31.44,
+     "y": 479.84,
+     "scale": 1.09,
+     "alpha": 1
+    },
+    {
+     "t": 23.37,
+     "x": 35.96,
+     "y": 480.56,
+     "scale": 1.06,
+     "alpha": 1
+    },
+    {
+     "t": 23.4,
+     "x": 42.32,
+     "y": 480.52,
+     "scale": 1.02,
+     "alpha": 1
+    },
+    {
+     "t": 23.43,
+     "x": 50.52,
+     "y": 480.72,
+     "scale": 0.97,
+     "alpha": 1
+    },
+    {
+     "t": 23.47,
+     "x": 52.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 23.5,
+     "x": 51.36,
+     "y": 480.96,
+     "scale": 0.96,
+     "alpha": 1
+    },
+    {
+     "t": 23.53,
+     "x": 48.68,
+     "y": 480.48,
+     "scale": 0.98,
+     "alpha": 1
+    },
+    {
+     "t": 23.57,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.6,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.63,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.67,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.7,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.73,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.77,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.8,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.83,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.87,
+     "x": 46.0,
+     "y": 481.0,
+     "scale": 1.0,
+     "alpha": 1
+    },
+    {
+     "t": 23.92,
+     "x": 46,
+     "y": 481,
+     "scale": 1,
+     "alpha": 1
+    }
+   ],
+   "text": {
+    "kind": "jackpot",
+    "key": "grand",
+    "ref": "25,000.00",
+    "cx": 206.0,
+    "cy": 512.5,
+    "height": 63
+   }
+  },
+  {
+   "id": "jp-major-bonus",
+   "t0": 10.4,
+   "t1": 30.65,
+   "x": 732,
+   "y": 483,
+   "w": 298,
+   "h": 61,
+   "patch": "patches/jp-major-bonus.png",
+   "fadeIn": 0.4,
+   "fadeOut": 0.05,
+   "track": [],
+   "text": {
+    "kind": "jackpot",
+    "key": "major",
+    "ref": "2,500.00",
+    "cx": 881.0,
+    "cy": 518.5,
+    "height": 51
+   }
+  },
+  {
+   "id": "jp-minor-bonus",
+   "t0": 10.4,
+   "t1": 30.65,
+   "x": 50,
+   "y": 641,
+   "w": 262,
+   "h": 53,
+   "patch": "patches/jp-minor-bonus.png",
+   "fadeIn": 0.4,
+   "fadeOut": 0.05,
+   "track": [],
+   "text": {
+    "kind": "jackpot",
+    "key": "minor",
+    "ref": "1,000.00",
+    "cx": 181.0,
+    "cy": 669.5,
+    "height": 49
+   }
+  },
+  {
+   "id": "jp-mini-bonus",
+   "t0": 10.4,
+   "t1": 30.65,
+   "x": 780,
+   "y": 641,
+   "w": 250,
+   "h": 53,
+   "patch": "patches/jp-mini-bonus.png",
+   "fadeIn": 0.4,
+   "fadeOut": 0.05,
+   "track": [],
+   "text": {
+    "kind": "jackpot",
+    "key": "mini",
+    "ref": "500.00",
+    "cx": 905.0,
+    "cy": 670.5,
+    "height": 45
+   }
+  },
+  {
+   "id": "bet-base",
+   "t0": 0.0,
+   "t1": 7.6,
+   "x": 972,
+   "y": 1541,
+   "w": 105,
+   "h": 50,
+   "patch": "patches/bet-base.png",
+   "fadeIn": 0.0,
+   "fadeOut": 0.3,
+   "track": [],
+   "text": {
+    "kind": "bet",
+    "key": "bet",
+    "ref": "0.20",
+    "cx": 1029.0,
+    "cy": 1569.0,
+    "height": 44
+   }
+  },
+  {
+   "id": "bet-bonus",
+   "t0": 10.4,
+   "t1": 30.65,
+   "x": 972,
+   "y": 1615,
+   "w": 105,
+   "h": 51,
+   "patch": "patches/bet-bonus.png",
+   "fadeIn": 0.4,
+   "fadeOut": 0.05,
+   "track": [],
+   "text": {
+    "kind": "bet",
+    "key": "bet",
+    "ref": "0.20",
+    "cx": 1029.0,
+    "cy": 1640.5,
+    "height": 39
+   }
+  },
+  {
+   "id": "bal-base-10",
+   "t0": 0.0,
+   "t1": 1.17,
+   "x": 420,
+   "y": 1973,
+   "w": 240,
+   "h": 57,
+   "patch": "patches/bal-base-10.png",
+   "fadeIn": 0.0,
+   "fadeOut": 0.05,
+   "track": [],
+   "text": {
+    "kind": "balance",
+    "key": "balance",
+    "ref": "10.00",
+    "cx": 540.5,
+    "cy": 2002.5,
+    "height": 41
+   }
+  },
+  {
+   "id": "bal-base-0",
+   "t0": 1.17,
+   "t1": 7.6,
+   "x": 420,
+   "y": 1973,
+   "w": 240,
+   "h": 57,
+   "patch": "patches/bal-base-0.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.05,
+   "track": [],
+   "text": {
+    "kind": "balance",
+    "key": "balance",
+    "ref": "0.00",
+    "cx": 540.5,
+    "cy": 2002.5,
+    "height": 41
+   }
+  },
+  {
+   "id": "bal-bonus-0",
+   "t0": 7.6,
+   "t1": 30.8,
+   "x": 420,
+   "y": 1973,
+   "w": 240,
+   "h": 57,
+   "patch": "patches/bal-bonus-0.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.05,
+   "track": [],
+   "text": {
+    "kind": "balance",
+    "key": "balance",
+    "ref": "0.00",
+    "cx": 540.5,
+    "cy": 2002.5,
+    "height": 41
+   }
+  },
+  {
+   "id": "bal-final",
+   "t0": 30.8,
+   "t1": 40.7,
+   "x": 420,
+   "y": 1973,
+   "w": 240,
+   "h": 57,
+   "patch": "patches/bal-final.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.05,
+   "track": [],
+   "text": {
+    "kind": "balance",
+    "key": "balance",
+    "ref": "7,800.00",
+    "cx": 540.5,
+    "cy": 2002.5,
+    "height": 41
+   }
+  },
+  {
+   "id": "total-bar",
+   "t0": 25.8,
+   "t1": 30.4,
+   "x": 335,
+   "y": 1416,
+   "w": 425,
+   "h": 78,
+   "patch": "patches/total-bar.png",
+   "fadeIn": 0.1,
+   "fadeOut": 0.2,
+   "track": [],
+   "text": {
+    "kind": "counter",
+    "key": "total",
+    "ref": "1,950.00",
+    "cx": 544.5,
+    "cy": 1454.0,
+    "height": 48,
+    "countUp": {
+     "from": "100.00",
+     "to": "1,950.00",
+     "t0": 25.9,
+     "t1": 29.5
+    },
+    "steps": [
+     {
+      "t": 25.9,
+      "v": "100.00"
+     },
+     {
+      "t": 26.5,
+      "v": "300.00"
+     },
+     {
+      "t": 27.1,
+      "v": "350.00"
+     },
+     {
+      "t": 27.4,
+      "v": "500.00"
+     },
+     {
+      "t": 28.0,
+      "v": "550.00"
+     },
+     {
+      "t": 28.6,
+      "v": "950.00"
+     },
+     {
+      "t": 28.9,
+      "v": "1,050.00"
+     },
+     {
+      "t": 29.5,
+      "v": "1,950.00"
+     }
+    ]
+   }
+  },
+  {
+   "id": "sizzling-label",
+   "t0": 30.9,
+   "t1": 39.95,
+   "x": 218,
+   "y": 1330,
+   "w": 649,
+   "h": 225,
+   "patch": "patches/sizzling-label.png",
+   "fadeIn": 0.1,
+   "fadeOut": 0.1,
+   "track": [],
+   "text": {
+    "kind": "counter",
+    "key": "sizzling",
+    "ref": "7,800.00",
+    "cx": 542.5,
+    "cy": 1430.0,
+    "height": 110,
+    "countUp": {
+     "from": "338.00",
+     "to": "7,800.00",
+     "t0": 31.0,
+     "t1": 35.78
+    }
+   }
+  },
+  {
+   "id": "coin-bonus-r0c0",
+   "t0": 20.43,
+   "t1": 23.95,
+   "x": 60,
+   "y": 810,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-gold.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r0c0",
+    "ref": "100.00",
+    "cx": 210.0,
+    "cy": 854.0,
+    "height": 37
+   }
+  },
+  {
+   "id": "coin-bonus-r0c1",
+   "t0": 11.8,
+   "t1": 23.95,
+   "x": 395,
+   "y": 810,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-gold.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r0c1",
+    "ref": "200.00",
+    "cx": 545.0,
+    "cy": 854.0,
+    "height": 36
+   }
+  },
+  {
+   "id": "coin-bonus-r0c2",
+   "t0": 20.53,
+   "t1": 23.95,
+   "x": 751,
+   "y": 810,
+   "w": 248,
+   "h": 88,
+   "patch": "patches/coin-gold5.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r0c2",
+    "ref": "50.00",
+    "cx": 875.0,
+    "cy": 854.0,
+    "height": 38
+   }
+  },
+  {
+   "id": "coin-bonus-r1c0",
+   "t0": 11.8,
+   "t1": 23.95,
+   "x": 60,
+   "y": 1065,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-gold.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r1c0",
+    "ref": "150.00",
+    "cx": 210.0,
+    "cy": 1109.0,
+    "height": 38
+   }
+  },
+  {
+   "id": "coin-bonus-r1c1",
+   "t0": 11.8,
+   "t1": 23.95,
+   "x": 421,
+   "y": 1065,
+   "w": 248,
+   "h": 88,
+   "patch": "patches/coin-gold5.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r1c1",
+    "ref": "50.00",
+    "cx": 545.0,
+    "cy": 1109.0,
+    "height": 38
+   }
+  },
+  {
+   "id": "coin-bonus-r1c2",
+   "t0": 11.8,
+   "t1": 23.95,
+   "x": 725,
+   "y": 1065,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-red.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r1c2",
+    "ref": "400.00",
+    "cx": 875.0,
+    "cy": 1109.0,
+    "height": 36
+   }
+  },
+  {
+   "id": "coin-bonus-r2c1",
+   "t0": 11.8,
+   "t1": 23.95,
+   "x": 395,
+   "y": 1319,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-gold.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r2c1",
+    "ref": "100.00",
+    "cx": 545.0,
+    "cy": 1363.0,
+    "height": 36
+   }
+  },
+  {
+   "id": "coin-bonus-r2c2",
+   "t0": 12.33,
+   "t1": 23.95,
+   "x": 725,
+   "y": 1319,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-whirl.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "counter",
+    "key": "r2c2",
+    "ref": "900.00",
+    "cx": 875.0,
+    "cy": 1363.0,
+    "height": 36,
+    "steps": [
+     {
+      "t": 12.4,
+      "v": "200.00"
+     },
+     {
+      "t": 13.3,
+      "v": "350.00"
+     },
+     {
+      "t": 13.7,
+      "v": "450.00"
+     },
+     {
+      "t": 14.1,
+      "v": "500.00"
+     },
+     {
+      "t": 15.2,
+      "v": "900.00"
+     }
+    ],
+    "countUp": {
+     "from": "200.00",
+     "to": "900.00",
+     "t0": 12.4,
+     "t1": 15.2
+    }
+   }
+  },
+  {
+   "id": "coin-base-r0c2",
+   "t0": 0.0,
+   "t1": 1.55,
+   "x": 722,
+   "y": 633,
+   "w": 285,
+   "h": 84,
+   "patch": "patches/coin-gold.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.05,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r0c2",
+    "ref": "200.00",
+    "cx": 864.0,
+    "cy": 675.0,
+    "height": 56
+   }
+  },
+  {
+   "id": "coin-base-r1c2",
+   "t0": 0.0,
+   "t1": 7.5,
+   "x": 722,
+   "y": 875,
+   "w": 285,
+   "h": 84,
+   "patch": "patches/coin-red.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r1c2",
+    "ref": "400.00",
+    "cx": 864.0,
+    "cy": 917.0,
+    "height": 33
+   }
+  },
+  {
+   "id": "coin-base-r0c1",
+   "t0": 1.7,
+   "t1": 7.5,
+   "x": 398,
+   "y": 633,
+   "w": 285,
+   "h": 84,
+   "patch": "patches/coin-gold.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r0c1",
+    "ref": "200.00",
+    "cx": 540.0,
+    "cy": 675.0,
+    "height": 56
+   }
+  },
+  {
+   "id": "coin-base-r1c0",
+   "t0": 1.85,
+   "t1": 7.5,
+   "x": 76,
+   "y": 875,
+   "w": 285,
+   "h": 84,
+   "patch": "patches/coin-gold.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r1c0",
+    "ref": "150.00",
+    "cx": 218.0,
+    "cy": 917.0,
+    "height": 56
+   }
+  },
+  {
+   "id": "coin-base-r1c1",
+   "t0": 3.95,
+   "t1": 7.5,
+   "x": 422,
+   "y": 875,
+   "w": 236,
+   "h": 84,
+   "patch": "patches/coin-gold5.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r1c1",
+    "ref": "50.00",
+    "cx": 540.0,
+    "cy": 917.0,
+    "height": 55
+   }
+  },
+  {
+   "id": "coin-base-r2c1",
+   "t0": 3.5,
+   "t1": 7.5,
+   "x": 398,
+   "y": 1119,
+   "w": 285,
+   "h": 84,
+   "patch": "patches/coin-gold.png",
+   "fadeIn": 0.05,
+   "fadeOut": 0.25,
+   "track": [],
+   "text": {
+    "kind": "coin",
+    "key": "r2c1",
+    "ref": "100.00",
+    "cx": 540.0,
+    "cy": 1161.0,
+    "height": 56
+   }
+  },
+  {
+   "id": "coin-dim-r0c0",
+   "t0": 23.7,
+   "t1": 30.65,
+   "x": 60,
+   "y": 810,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-dim-r0c0.png",
+   "fadeIn": 0.3,
+   "fadeOut": 0.05,
+   "track": [
+    {
+     "t": 23.7,
+     "x": 60,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.2,
+     "x": 60,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.35,
+     "x": 60,
+     "y": 810,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.1,
+     "x": 60,
+     "y": 810,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.35,
+     "x": 60,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 30.65,
+     "x": 60,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    }
+   ],
+   "text": {
+    "kind": "coin",
+    "key": "r0c0",
+    "ref": "100.00",
+    "cx": 210.0,
+    "cy": 854.0,
+    "height": 37,
+    "dim": true
+   }
+  },
+  {
+   "id": "coin-dim-r0c1",
+   "t0": 23.7,
+   "t1": 30.65,
+   "x": 395,
+   "y": 810,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-dim-r0c1.png",
+   "fadeIn": 0.3,
+   "fadeOut": 0.05,
+   "track": [
+    {
+     "t": 23.7,
+     "x": 395,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.2,
+     "x": 395,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.35,
+     "x": 395,
+     "y": 810,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.1,
+     "x": 395,
+     "y": 810,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.35,
+     "x": 395,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 30.65,
+     "x": 395,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    }
+   ],
+   "text": {
+    "kind": "coin",
+    "key": "r0c1",
+    "ref": "200.00",
+    "cx": 545.0,
+    "cy": 854.0,
+    "height": 36,
+    "dim": true
+   }
+  },
+  {
+   "id": "coin-dim-r0c2",
+   "t0": 23.7,
+   "t1": 30.65,
+   "x": 751,
+   "y": 810,
+   "w": 248,
+   "h": 88,
+   "patch": "patches/coin-dim-r0c2.png",
+   "fadeIn": 0.3,
+   "fadeOut": 0.05,
+   "track": [
+    {
+     "t": 23.7,
+     "x": 751,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.2,
+     "x": 751,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.35,
+     "x": 751,
+     "y": 810,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.1,
+     "x": 751,
+     "y": 810,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.35,
+     "x": 751,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 30.65,
+     "x": 751,
+     "y": 810,
+     "scale": 1,
+     "alpha": 1
+    }
+   ],
+   "text": {
+    "kind": "coin",
+    "key": "r0c2",
+    "ref": "50.00",
+    "cx": 875.0,
+    "cy": 854.0,
+    "height": 38,
+    "dim": true
+   }
+  },
+  {
+   "id": "coin-dim-r1c0",
+   "t0": 23.7,
+   "t1": 30.65,
+   "x": 60,
+   "y": 1065,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-dim-r1c0.png",
+   "fadeIn": 0.3,
+   "fadeOut": 0.05,
+   "track": [
+    {
+     "t": 23.7,
+     "x": 60,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.2,
+     "x": 60,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.35,
+     "x": 60,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.1,
+     "x": 60,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.35,
+     "x": 60,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 30.65,
+     "x": 60,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 1
+    }
+   ],
+   "text": {
+    "kind": "coin",
+    "key": "r1c0",
+    "ref": "150.00",
+    "cx": 210.0,
+    "cy": 1109.0,
+    "height": 38,
+    "dim": true
+   }
+  },
+  {
+   "id": "coin-dim-r1c2",
+   "t0": 23.7,
+   "t1": 30.65,
+   "x": 725,
+   "y": 1065,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-dim-r1c2.png",
+   "fadeIn": 0.3,
+   "fadeOut": 0.05,
+   "track": [
+    {
+     "t": 23.7,
+     "x": 725,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.2,
+     "x": 725,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.35,
+     "x": 725,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.1,
+     "x": 725,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.35,
+     "x": 725,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 30.65,
+     "x": 725,
+     "y": 1065,
+     "scale": 1,
+     "alpha": 1
+    }
+   ],
+   "text": {
+    "kind": "coin",
+    "key": "r1c2",
+    "ref": "400.00",
+    "cx": 875.0,
+    "cy": 1109.0,
+    "height": 36,
+    "dim": true
+   }
+  },
+  {
+   "id": "coin-dim-r2c1",
+   "t0": 23.7,
+   "t1": 30.65,
+   "x": 395,
+   "y": 1319,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-dim-r2c1.png",
+   "fadeIn": 0.3,
+   "fadeOut": 0.05,
+   "track": [
+    {
+     "t": 23.7,
+     "x": 395,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.2,
+     "x": 395,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.35,
+     "x": 395,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.1,
+     "x": 395,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.35,
+     "x": 395,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 30.65,
+     "x": 395,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 1
+    }
+   ],
+   "text": {
+    "kind": "coin",
+    "key": "r2c1",
+    "ref": "100.00",
+    "cx": 545.0,
+    "cy": 1363.0,
+    "height": 36,
+    "dim": true
+   }
+  },
+  {
+   "id": "coin-dim-r2c2",
+   "t0": 23.7,
+   "t1": 30.65,
+   "x": 725,
+   "y": 1319,
+   "w": 300,
+   "h": 88,
+   "patch": "patches/coin-dim-r2c2.png",
+   "fadeIn": 0.3,
+   "fadeOut": 0.05,
+   "track": [
+    {
+     "t": 23.7,
+     "x": 725,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.2,
+     "x": 725,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 24.35,
+     "x": 725,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.1,
+     "x": 725,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 0
+    },
+    {
+     "t": 25.35,
+     "x": 725,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 1
+    },
+    {
+     "t": 30.65,
+     "x": 725,
+     "y": 1319,
+     "scale": 1,
+     "alpha": 1
+    }
+   ],
+   "text": {
+    "kind": "coin",
+    "key": "r2c2",
+    "ref": "900.00",
+    "cx": 875.0,
+    "cy": 1363.0,
+    "height": 36,
+    "dim": true
+   }
+  }
+ ],
+ "conflicts": [
+  {
+   "id": "jp-flash-base-to-bonus",
+   "t0": 7.2,
+   "t1": 10.4,
+   "what": "screen fades base->red splash BONUS GAME; plates ghost and are absent 7.9-10.4; patches fade with the video"
+  },
+  {
+   "id": "jp-grand-pulse",
+   "t0": 20.8,
+   "t1": 23.7,
+   "what": "GRAND plate scale pulse (~1.15x) once per second; track gives scale; fit score low at the peak (glow)"
+  },
+  {
+   "id": "jp-sparkle-flash",
+   "t0": 24.3,
+   "t1": 27.5,
+   "what": "white flash and sparks across all four plates (match score 0.3-0.6); digits briefly washed out"
+  },
+  {
+   "id": "jp-minor-glints",
+   "t0": 25.5,
+   "t1": 27.4,
+   "what": "glints over MINOR/MINI plate digits"
+  },
+  {
+   "id": "coins-landing-pops",
+   "t0": 0.0,
+   "t1": 7.4,
+   "what": "base coins pop/slide between cells (200 moves r0c2->r0c1 ~1.4-2.0 s), fire whirl over r1c1/r2c0 2.0-4.3 s; tracks interpolate through gaps"
+  },
+  {
+   "id": "base-fire-trails",
+   "t0": 5.9,
+   "t1": 6.5,
+   "what": "fire/shock ring over r0c2..r1c2 coins"
+  },
+  {
+   "id": "bonus-intro-overlay",
+   "t0": 10.4,
+   "t1": 11.9,
+   "what": "splash BONUS GAME text fades over the board; coin text not readable until about 11.9"
+  },
+  {
+   "id": "bonus-fire-trail",
+   "t0": 12.4,
+   "t1": 14.2,
+   "what": "fire trail crosses coin r1c0/r1c1/r2c2 text during Coin Collect whirl"
+  },
+  {
+   "id": "bonus-whirl-r2c2",
+   "t0": 11.3,
+   "t1": 19.5,
+   "what": "swirl animation behind bottom-right value (blurred label patch, not a clean plate)"
+  },
+  {
+   "id": "bonus-fireball-r2c1",
+   "t0": 14.0,
+   "t1": 16.5,
+   "what": "flying fire ball over r2c1/r2c2 coins and a 150.00 flyer"
+  },
+  {
+   "id": "bonus-dim-flash",
+   "t0": 24.3,
+   "t1": 25.3,
+   "what": "white-yellow flash over the whole board; dim-coin patches fade to alpha 0 so the faint dimmed digits stay visible underneath"
+  },
+  {
+   "id": "bonus-coins-dim",
+   "t0": 23.7,
+   "t1": 24.3,
+   "what": "all coins dim; X4 multiplier art appears in r1c1 (coin text hidden under X4; no dim patch there)"
+  },
+  {
+   "id": "bonus-flame-column",
+   "t0": 26.2,
+   "t1": 30.0,
+   "what": "vertical flame column over r0c1/r1c1/r2c1 text and the total bar centre"
+  },
+  {
+   "id": "total-bar-glow",
+   "t0": 25.1,
+   "t1": 30.4,
+   "what": "bar flashes yellow, glow changes behind digits; static patch is the empty bar at 25.6 s"
+  },
+  {
+   "id": "bar-to-sizzling",
+   "t0": 30.3,
+   "t1": 30.9,
+   "what": "total bar zooms and cross-fades into SIZZLING screen"
+  },
+  {
+   "id": "sizzling-flying-coins",
+   "t0": 31.0,
+   "t1": 40.0,
+   "what": "flying coins cross the counter region; patch is a static blurred dark-red label"
+  }
+ ]
+}

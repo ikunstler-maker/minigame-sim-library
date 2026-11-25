@@ -1,4 +1,4 @@
-import type { Container } from 'pixi.js';
+import { Container, Sprite, type Texture } from 'pixi.js';
 import type { OverlayItem } from './timeline';
 import { formatMoney, makeNumber, setNumberText, type NumberKind } from './numbers/numberStyles';
 
@@ -11,8 +11,14 @@ export interface PatchText {
   cy: number;
   height: number;
   countUp?: { from: string; to: string; t0: number; t1: number };
-  /** Coin is dimmed in the video (end of the bonus). */
-  dim?: boolean;
+  /** Clean coin sprite drawn under the number ('gold' | 'red'), centred on coinCx/coinCy. */
+  coin?: 'gold' | 'red' | 'whirl';
+  coinCx?: number;
+  coinCy?: number;
+  /** Coin radius in the video, px. */
+  coinR?: number;
+  /** Video time when the coin is collected and turns dark. */
+  dimAt?: number;
   /** Step counter as in the video: value jumps at each t. */
   steps?: { t: number; v: string }[];
 }
@@ -102,9 +108,16 @@ export class NumbersLayer {
     steps?: { t: number; v: number }[];
   }[] = [];
 
+  private dimmers: { node: Container; at: number }[] = [];
+  private spinners: Sprite[] = [];
+
+  /**
+   * @param coins clean coin textures (press-kit sym1 / sym5); coin radius in the art is 108 of 237 px
+   */
   constructor(
     private readonly values: Record<string, number>,
     private readonly fmt: MoneyFormat,
+    private readonly coins: { gold: Texture | null; red: Texture | null; whirl?: Texture | null } = { gold: null, red: null },
   ) {}
 
   private money(v: number): string {
@@ -130,16 +143,25 @@ export class NumbersLayer {
       const steps = t.steps?.map((s) => ({ t: s.t, v: (parseRef(s.v) * to) / refTo }));
       this.counters.push({ node, from, to, t0: t.countUp.t0, t1: t.countUp.t1, steps });
     } else {
-      node = makeNumber(style, this.money(this.value(t)), t.height);
+      node = makeNumber(style, this.money(this.value(t)), t.height * (style === 'coin' ? 1.14 : 1));
     }
     // The free font is wider than the game's: keep the number inside its patch.
     this.fit(node, item.w * (style === 'coin' || style === 'whirl' ? 1 : 0.92));
-    if (t.dim) {
-      node.tint = 0x6e5a3c;
-      node.alpha = 0.8;
-    }
     node.position.set(t.cx - item.x, t.cy - item.y);
-    return node;
+    const tex = t.coin ? this.coins[t.coin] : null;
+    if (!tex || t.coinCx === undefined || t.coinCy === undefined) return node;
+    // clean coin from the press kit under the number, replacing the video coin's digits
+    const wrap = new Container();
+    const coin = new Sprite(tex);
+    coin.anchor.set(0.5);
+    // coin art: radius 108 of 237 px; whirl art: radius 121 of 276 px
+    const artR = t.coin === 'whirl' ? 121 * (tex.width / 276) : 108 * (tex.width / 237);
+    coin.scale.set((t.coinR ?? 150) / artR);
+    if (t.coin === 'whirl') this.spinners.push(coin);
+    coin.position.set(t.coinCx - item.x, t.coinCy - item.y);
+    wrap.addChild(coin, node);
+    if (t.dimAt !== undefined) this.dimmers.push({ node: wrap, at: t.dimAt });
+    return wrap;
   };
 
   private fit(node: Container, maxW: number): void {
@@ -150,6 +172,10 @@ export class NumbersLayer {
 
   /** Advance counters to the plate time (seconds): steps jump, count-ups run linearly. Call every frame. */
   update(time: number): void {
+    // collected coins turn dark, as in the reference
+    for (const d of this.dimmers) d.node.tint = time >= d.at ? 0x5e5040 : 0xffffff;
+    // the Coin Collect whirl turns slowly, about one turn in 2.5 s
+    for (const w of this.spinners) w.rotation = -time * ((Math.PI * 2) / 2.5);
     for (const c of this.counters) {
       let v: number;
       if (c.steps?.length) {

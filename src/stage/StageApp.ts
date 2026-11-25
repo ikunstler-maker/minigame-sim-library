@@ -3,6 +3,7 @@ import { PT, STAGE_H, STAGE_W, type Preset } from '../config';
 import type { AudioBus } from '../audio/AudioBus';
 import { loadCatalog } from '../ios/iconCatalog';
 import { GameStub } from './GameStub';
+import { loadTexture } from './textures';
 import { PlateGame } from '../games/coin-volcano-plate/PlateGame';
 import { NumbersLayer, deriveTotals, type PatchText } from '../games/coin-volcano-plate/numbersLayer';
 import { loadGameFonts } from '../games/coin-volcano-plate/numbers/numberStyles';
@@ -24,6 +25,7 @@ export class StageApp {
   private statusLayer = new Container();
   private busy = false;
   private gamePromise: Promise<PlateGame | null> | null = null;
+  private home: HomeScreen | null = null;
 
   constructor(private readonly preset: Preset, private readonly audio: AudioBus) {}
 
@@ -49,6 +51,8 @@ export class StageApp {
     } else {
       const home = await HomeScreen.create(this.preset, await loadCatalog());
       home.onOpen = (req) => void this.openApp(home, req);
+      this.home = home;
+      home.setGameProgress(0);
       this.scenes.addChild(home);
       // Preload the game while the home screen is on, so the tap opens it at once.
       this.gamePromise = this.loadGame();
@@ -123,7 +127,10 @@ export class StageApp {
    */
   private async loadGame(): Promise<PlateGame | null> {
     const g = this.preset.game;
-    if (g.variant !== 'plate') return null;
+    if (g.variant !== 'plate') {
+      this.home?.setGameProgress(1);
+      return null;
+    }
     try {
       await loadGameFonts();
       const base = './private/coin-volcano/plate/';
@@ -134,7 +141,8 @@ export class StageApp {
       } catch {
         /* no patches: plain plate */
       }
-      const numbers = new NumbersLayer(deriveTotals(items, g.values), g.currency);
+      const [gold, red, whirl] = await Promise.all(['coin-gold', 'coin-red', 'whirl'].map((n) => loadTexture(`${base}coins/${n}.png`)));
+      const numbers = new NumbersLayer(deriveTotals(items, g.values), g.currency, { gold, red, whirl });
       const game = new PlateGame({
         baseUrl: base,
         audio: g.soundtrack === 'off' ? null : this.audio,
@@ -142,6 +150,7 @@ export class StageApp {
         ticker: this.app.ticker,
         makeContent: numbers.makeContent,
         showTapAreas: g.showTapAreas,
+        onProgress: (p) => this.home?.setGameProgress(p),
       });
       await game.load();
       this.app.ticker.add(() => numbers.update(game.time));
@@ -151,6 +160,7 @@ export class StageApp {
       return game;
     } catch (e) {
       console.warn('Plate game unavailable, showing placeholder:', e);
+      this.home?.setGameProgress(1);
       return null;
     }
   }

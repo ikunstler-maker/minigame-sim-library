@@ -15,7 +15,7 @@ What it does:
   and the plate is exactly 1161 frames = 38.7 s long. That also matches the
   separated soundtrack audio.m4a (38.70 s).
 - No audio (the soundtrack is a separate file played through the AudioBus).
-- H.264 High, yuv420p, 30 fps, CRF 20, GOP 15 (fast seeking), +faststart.
+- H.264 High, yuv420p, 30 fps, CRF 23, GOP 30, +faststart.
 - Writes poster.jpg = frame 0.
 """
 import subprocess
@@ -29,8 +29,8 @@ DEFAULT_OUT = ROOT / "public" / "private" / "coin-volcano" / "plate"
 FPS = 30
 LAST_FRAME = 1160  # last clean frame before the bank push (see docstring)
 CROP = "crop=1080:2340:0:3"
-CRF = 20
-GOP = 15
+CRF = 23  # the plate is fully preloaded into memory, so size matters more than seek speed
+GOP = 30
 
 
 def ffmpeg_exe() -> str:

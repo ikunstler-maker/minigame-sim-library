@@ -45,6 +45,37 @@ function cover(s: Sprite): void {
  */
 export class HomeScreen extends Container {
   onOpen: (req: OpenRequest) => void = () => {};
+  private gameIcon: Container | null = null;
+  private progress: Graphics | null = null;
+
+  /**
+   * iOS-style download pie over the game icon while the game loads (0..1).
+   * Removed at 1, so a take recorded after loading shows a clean icon.
+   */
+  setGameProgress(p: number): void {
+    if (!this.gameIcon) return;
+    if (p >= 1) {
+      this.progress?.destroy();
+      this.progress = null;
+      return;
+    }
+    if (!this.progress) {
+      this.progress = new Graphics();
+      this.gameIcon.addChild(this.progress);
+    }
+    const c = ICON / 2, r = ICON * 0.24;
+    const a0 = -Math.PI / 2;
+    this.progress
+      .clear()
+      .roundRect(0, 0, ICON, ICON, ICON_RADIUS)
+      .fill({ color: 0x000000, alpha: 0.45 })
+      .circle(c, c, r)
+      .stroke({ color: 0xffffff, width: 2.2 * PT, alpha: 0.95 })
+      .moveTo(c, c)
+      .arc(c, c, r - 3.5 * PT, a0, a0 + Math.PI * 2 * Math.max(0.001, p))
+      .closePath()
+      .fill({ color: 0xffffff, alpha: 0.95 });
+  }
 
   private constructor() {
     super();
@@ -160,6 +191,7 @@ export class HomeScreen extends Container {
       if (label.width > ICON + 22 * PT) label.scale.set((ICON + 22 * PT) / label.width);
       c.addChild(label);
     }
+    if (slot.role === 'game' && !this.gameIcon) this.gameIcon = c;
     c.eventMode = 'static';
     c.cursor = 'pointer';
     const shade = new Graphics().roundRect(0, 0, ICON, ICON, ICON_RADIUS).fill({ color: 0x000000, alpha: 0.35 });

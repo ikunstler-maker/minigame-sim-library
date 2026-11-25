@@ -29,7 +29,14 @@ export class PlateVideo {
   private rvfcHandle: number | null = null;
   private lastRvfcMs = 0;
 
-  constructor(url: string) {
+  private blobUrl = '';
+
+  /**
+   * @param url video URL; it is downloaded whole into memory by `load` so playback
+   *   never waits for the network (streaming caused freezes)
+   * @param onProgress download progress 0..1
+   */
+  constructor(private readonly url: string, private readonly onProgress?: (p: number) => void) {
     const v = document.createElement('video') as RvfcVideo;
     v.muted = true;
     v.defaultMuted = true;
@@ -39,7 +46,6 @@ export class PlateVideo {
     v.setAttribute('muted', '');
     v.preload = 'auto';
     v.loop = false;
-    v.src = url;
     // Kept in the DOM (1 px, nearly transparent): iOS may not decode frames of a
     // detached video element. Not display:none for the same reason.
     Object.assign(v.style, {
@@ -66,8 +72,9 @@ export class PlateVideo {
    * caller keeps showing the poster until the first tap starts playback.
    */
   async load(timeoutMs = 8000): Promise<void> {
-    await this.source.load().catch(() => undefined);
     const v = this.video;
+    v.src = await this.download();
+    await this.source.load().catch(() => undefined);
     const haveData = () => v.readyState >= 2;
     if (!haveData()) {
       await new Promise<void>((res) => {
@@ -86,6 +93,32 @@ export class PlateVideo {
     if (v.readyState >= 1 && v.currentTime !== 0) await this.seek(0);
     this.markDirty();
     this.tick();
+  }
+
+  /** Fetch the whole file with progress and return a blob URL (falls back to the plain URL). */
+  private async download(): Promise<string> {
+    try {
+      const res = await fetch(this.url);
+      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+      const total = Number(res.headers.get('content-length')) || 0;
+      const reader = res.body.getReader();
+      const parts: Uint8Array[] = [];
+      let got = 0;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        parts.push(value);
+        got += value.length;
+        if (total) this.onProgress?.(got / total);
+      }
+      this.onProgress?.(1);
+      this.blobUrl = URL.createObjectURL(new Blob(parts as BlobPart[], { type: 'video/mp4' }));
+      return this.blobUrl;
+    } catch (e) {
+      console.warn('[plate] full download failed, streaming instead:', e);
+      this.onProgress?.(1);
+      return this.url;
+    }
   }
 
   /** Current plate time in seconds. */
@@ -138,6 +171,7 @@ export class PlateVideo {
 
   /** Remove the element and free the texture. */
   destroy(): void {
+    if (this.blobUrl) URL.revokeObjectURL(this.blobUrl);
     const v = this.video;
     if (this.rvfcHandle !== null) v.cancelVideoFrameCallback?.(this.rvfcHandle);
     this.rvfcHandle = null;
