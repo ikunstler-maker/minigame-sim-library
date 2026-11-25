@@ -46,6 +46,11 @@ export interface PlateGameOptions {
   ticker?: Ticker;
   /** Attach `update` to the ticker automatically (default true). Set false to call `update(dtMs)` yourself. */
   autoTick?: boolean;
+  /**
+   * Auto-continue: leave each hold by itself after this many ms (a tap still works
+   * earlier). Undefined = wait for the tap, as in the real game.
+   */
+  autoContinueMs?: number;
   /** Video download progress 0..1 (the plate is loaded whole before play). */
   onProgress?: (p: number) => void;
   /** Draw the active tap area (dev aid). Default false. */
@@ -81,6 +86,7 @@ export class PlateGame extends Container implements GamePlugin {
   private timeline: PlateTimeline = { holds: [] };
   private nextHold = 0;
   private activeHold: Hold | null = null;
+  private autoTimer: ReturnType<typeof setTimeout> | null = null;
   private _state: PlateState = 'loading';
   private ticker: Ticker | null = null;
   private lastDriftCheck = 0;
@@ -185,6 +191,7 @@ export class PlateGame extends Container implements GamePlugin {
 
   /** Stop everything and free resources. */
   override destroy(): void {
+    if (this.autoTimer) clearTimeout(this.autoTimer);
     this.ticker?.remove(this.onTick, this);
     this.ticker = null;
     const v = this.video.video;
@@ -247,6 +254,8 @@ export class PlateGame extends Container implements GamePlugin {
     void this.video.seek(h.t);
     this.drawTapArea(h);
     this.onHold(h);
+    const wait = this.opts.autoContinueMs;
+    if (wait !== undefined && wait >= 0) this.autoTimer = setTimeout(() => this.release(), wait);
   }
 
   private onTap(e: FederatedPointerEvent): void {
@@ -259,6 +268,14 @@ export class PlateGame extends Container implements GamePlugin {
     if (this._state !== 'holding' || !this.activeHold) return;
     const p = this.toLocal(e.global);
     if (!hitsTapArea(this.activeHold.tapArea, p.x, p.y)) return;
+    this.release();
+  }
+
+  /** Leave the current hold and play on (tap or auto-continue). */
+  private release(): void {
+    if (this._state !== 'holding' || !this.activeHold) return;
+    if (this.autoTimer) clearTimeout(this.autoTimer);
+    this.autoTimer = null;
     const h = this.activeHold;
     this.activeHold = null;
     this.nextHold++;

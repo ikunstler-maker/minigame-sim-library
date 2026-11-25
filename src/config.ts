@@ -77,6 +77,10 @@ export interface GameConfig {
   values: Record<string, number>;
   /** Draw the tap areas (spin button) as outlines, for rehearsal. */
   showTapAreas: boolean;
+  /** Wait for a tap on Spin and on the BONUS GAME splash (like the real game) instead of continuing by itself. */
+  waitForTaps: boolean;
+  /** Pause at each of those moments before continuing by itself, ms. */
+  autoContinueMs: number;
 }
 
 export interface Preset {
@@ -143,6 +147,8 @@ export const DEFAULT_PRESET: Preset = {
     currency: { thousands: ',', decimal: '.', decimals: 2, prefix: '', suffix: '' },
     values: {},
     showTapAreas: false,
+    waitForTaps: false,
+    autoContinueMs: 700,
   },
   statusBar: {
     time: '10:37',

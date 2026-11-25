@@ -150,6 +150,7 @@ export class StageApp {
         ticker: this.app.ticker,
         makeContent: numbers.makeContent,
         showTapAreas: g.showTapAreas,
+        autoContinueMs: g.waitForTaps ? undefined : g.autoContinueMs,
         onProgress: (p) => this.home?.setGameProgress(p),
       });
       await game.load();

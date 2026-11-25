@@ -88,6 +88,8 @@ async function renderStudio(): Promise<void> {
       ${text('game.currency.thousands', 'Thousands separator')}
       ${text('game.currency.decimal', 'Decimal separator')}
       ${select('game.currency.decimals', 'Decimals', [0, 1, 2], true)}
+      ${check('game.waitForTaps', 'Wait for my tap on Spin and on BONUS GAME')}
+      ${num('game.autoContinueMs', 'Otherwise continue after (ms)', 0, 5000)}
       ${check('game.showTapAreas', 'Show tap areas (rehearsal)')}
       <p class="note">Numbers (empty = value from the reference video):</p>
       <div id="game-values" class="values"><p class="note">Loading…</p></div>
