@@ -179,7 +179,5 @@ $RECYCLE.BIN/
 /reports/
 /test-results/
 
-# Studio-owned game art served only from local builds
-public/private/
-# QA screenshots can show game art; kept on disk, not in the public repo
-production/qa/evidence/stage[2-9]-*
+# Game art for the site is published (user decision 2026-11-25, design/decisions.md D6).
+# Raw kit, reference video and audio stems stay local:

@@ -1,0 +1,18 @@
+{
+  "_comment": "Hand-tuned from frames of the reference take. Times in plate seconds (30 fps, frame n = n/30). Rects in stage px (1080x2340).",
+  "duration": 38.7,
+  "holds": [
+    {
+      "_comment": "Idle base board, frame 27. The spin press starts at frame 33 (1.1 s). Spin button circle: centre (541,1621), r ~113.",
+      "t": 0.9,
+      "tapArea": { "x": 420, "y": 1500, "w": 240, "h": 240 },
+      "label": "spin"
+    },
+    {
+      "_comment": "BONUS GAME splash fully built from frame 280 (9.33 s); it starts to dissolve into the red board at frame 310 (10.33 s).",
+      "t": 9.6,
+      "tapArea": "anywhere",
+      "label": "bonus-start"
+    }
+  ]
+}

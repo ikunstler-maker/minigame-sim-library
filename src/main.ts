@@ -5,6 +5,7 @@ import { CanvasRecorder, pickMimeType, type Recording } from './recorder/CanvasR
 import { StageApp } from './stage/StageApp';
 import { HomeEditor } from './studio/HomeEditor';
 import { loadCatalog } from './ios/iconCatalog';
+import { itemText, valueKey, type PatchText } from './games/coin-volcano-plate/numbersLayer';
 
 const studioEl = document.getElementById('studio')!;
 const previewEl = document.getElementById('preview')!;
@@ -78,6 +79,20 @@ async function renderStudio(): Promise<void> {
 
     <details open><summary>Home screen</summary><div id="home-editor"></div></details>
 
+    <details><summary>Game — Coin Volcano</summary><section>
+      ${select('game.variant', 'Version', ['plate', 'code'])}
+      <p class="note">plate = the reference take replayed with your numbers · code = fully coded version (coming later, for comparison)</p>
+      ${select('game.soundtrack', 'Sound', ['full', 'sfx', 'off'])}
+      ${text('game.currency.prefix', 'Currency before')}
+      ${text('game.currency.suffix', 'Currency after')}
+      ${text('game.currency.thousands', 'Thousands separator')}
+      ${text('game.currency.decimal', 'Decimal separator')}
+      ${select('game.currency.decimals', 'Decimals', [0, 1, 2], true)}
+      ${check('game.showTapAreas', 'Show tap areas (rehearsal)')}
+      <p class="note">Numbers (empty = value from the reference video):</p>
+      <div id="game-values" class="values"><p class="note">Loading…</p></div>
+    </section></details>
+
     <details><summary>Status bar</summary><section>
       ${text('statusBar.time', 'Time')}
       ${num('statusBar.battery', 'Battery %', 1, 100)}
@@ -136,6 +151,47 @@ async function renderStudio(): Promise<void> {
     void renderStudio();
   });
   homeEditor = new HomeEditor(document.getElementById('home-editor')!, () => preset, commit, await loadCatalog());
+  void renderGameValues();
+}
+
+/** One editable field per number found in the plate's patches.json. */
+async function renderGameValues(): Promise<void> {
+  const box = document.getElementById('game-values');
+  if (!box) return;
+  let items: { id?: string; text?: PatchText }[] = [];
+  try {
+    const json = await fetch('./private/coin-volcano/plate/patches.json').then((r) => r.json());
+    items = Array.isArray(json) ? json : json.items ?? [];
+  } catch {
+    box.innerHTML = '<p class="note">Game files are not on this build (private art). Numbers can be set on a local build.</p>';
+    return;
+  }
+  const rows = new Map<string, { label: string; ref: string }>();
+  for (const it of items) {
+    const t = itemText(it);
+    if (!t) continue;
+    if (t.countUp) {
+      rows.set(valueKey(t, 'from'), { label: `${t.kind} ${t.key} — from`, ref: t.countUp.from });
+      rows.set(valueKey(t, 'to'), { label: `${t.kind} ${t.key} — to`, ref: t.countUp.to });
+    } else {
+      rows.set(valueKey(t), { label: `${t.kind} ${t.key}`, ref: t.ref });
+    }
+  }
+  box.innerHTML = [...rows.entries()]
+    .map(([k, r]) => {
+      const v = preset.game.values[k];
+      return `<label>${r.label} <input data-value-key="${attr(k)}" type="number" inputmode="decimal" step="0.01" placeholder="${attr(r.ref)}" value="${v ?? ''}"></label>`;
+    })
+    .join('');
+  box.querySelectorAll<HTMLInputElement>('[data-value-key]').forEach((el) =>
+    el.addEventListener('change', () => {
+      const p = structuredClone(preset);
+      const k = el.dataset.valueKey!;
+      if (el.value === '') delete p.game.values[k];
+      else p.game.values[k] = Number(el.value);
+      commit(p);
+    }),
+  );
 }
 
 // ---------- Preview ----------
@@ -236,3 +292,10 @@ function renderExport(): void {
 
 void renderStudio();
 show('studio');
+
+// Dev/calibration: ?game opens the game directly; ?game&t=12.5 freezes on that frame.
+const qs = new URLSearchParams(location.search);
+if (qs.has('game')) {
+  const t = qs.get('t');
+  void startPreview().then(() => stage?.openGameDirect(t === null ? undefined : Number(t)));
+}

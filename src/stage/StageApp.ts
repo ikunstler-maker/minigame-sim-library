@@ -3,6 +3,9 @@ import { PT, STAGE_H, STAGE_W, type Preset } from '../config';
 import type { AudioBus } from '../audio/AudioBus';
 import { loadCatalog } from '../ios/iconCatalog';
 import { GameStub } from './GameStub';
+import { PlateGame } from '../games/coin-volcano-plate/PlateGame';
+import { NumbersLayer, deriveTotals, type PatchText } from '../games/coin-volcano-plate/numbersLayer';
+import { loadGameFonts } from '../games/coin-volcano-plate/numbers/numberStyles';
 import { HomeScreen, ICON, type OpenRequest } from './ios/HomeScreen';
 import { StatusBar } from './ios/StatusBar';
 import { TestScene } from './TestScene';
@@ -20,6 +23,7 @@ export class StageApp {
   private scenes = new Container();
   private statusLayer = new Container();
   private busy = false;
+  private gamePromise: Promise<PlateGame | null> | null = null;
 
   constructor(private readonly preset: Preset, private readonly audio: AudioBus) {}
 
@@ -46,6 +50,8 @@ export class StageApp {
       const home = await HomeScreen.create(this.preset, await loadCatalog());
       home.onOpen = (req) => void this.openApp(home, req);
       this.scenes.addChild(home);
+      // Preload the game while the home screen is on, so the tap opens it at once.
+      this.gamePromise = this.loadGame();
     }
     this.statusLayer.addChild(new StatusBar(this.preset.statusBar));
     return this.app.canvas;
@@ -56,7 +62,7 @@ export class StageApp {
     if (this.busy) return;
     this.busy = true;
     const win = new Container();
-    const content = new GameStub(req.slot.label, req.texture);
+    const content = (await (this.gamePromise ?? this.loadGame())) ?? new GameStub(req.slot.label, req.texture);
     const iconArt = req.texture ? new Sprite(req.texture) : null;
     const mask = new Graphics();
     win.addChild(content);
@@ -107,7 +113,60 @@ export class StageApp {
     home.visible = false;
     dim.visible = false;
     darkBar.visible = false;
+    if (content instanceof PlateGame) content.start();
     this.busy = false;
+  }
+
+  /**
+   * Load the plate game with its numbers. Returns null when the private plate files
+   * are not on this build (e.g. the public site), so the placeholder is shown instead.
+   */
+  private async loadGame(): Promise<PlateGame | null> {
+    const g = this.preset.game;
+    if (g.variant !== 'plate') return null;
+    try {
+      await loadGameFonts();
+      const base = './private/coin-volcano/plate/';
+      let items: { id?: string; text?: PatchText }[] = [];
+      try {
+        const json = await fetch(`${base}patches.json`).then((r) => r.json());
+        items = Array.isArray(json) ? json : (json.items ?? []);
+      } catch {
+        /* no patches: plain plate */
+      }
+      const numbers = new NumbersLayer(deriveTotals(items, g.values), g.currency);
+      const game = new PlateGame({
+        baseUrl: base,
+        audio: g.soundtrack === 'off' ? null : this.audio,
+        audioUrl: g.soundtrack === 'sfx' ? `${base}audio-sfx.m4a` : `${base}audio.m4a`,
+        ticker: this.app.ticker,
+        makeContent: numbers.makeContent,
+        showTapAreas: g.showTapAreas,
+      });
+      await game.load();
+      this.app.ticker.add(() => numbers.update(game.time));
+      game.onFinished = () => {
+        /* Stage 5: push notification and the user's layout page */
+      };
+      return game;
+    } catch (e) {
+      console.warn('Plate game unavailable, showing placeholder:', e);
+      return null;
+    }
+  }
+
+  /**
+   * Dev aid: open the game directly (no home screen) and, when `t` is given,
+   * freeze on that video time. Used by `?game&t=12` for calibration.
+   */
+  async openGameDirect(t?: number): Promise<void> {
+    const game = await (this.gamePromise ?? this.loadGame());
+    if (!game) return;
+    this.scenes.removeChildren();
+    this.scenes.addChild(game);
+    if (t === undefined) game.start();
+    else await game.debugFreeze(t);
+    (window as unknown as { plate: PlateGame }).plate = game;
   }
 
   /** Tear down the renderer and all scenes. */

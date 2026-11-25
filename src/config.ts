@@ -67,6 +67,18 @@ export interface HomeConfig {
   searchLabel: string;
 }
 
+export interface GameConfig {
+  /** 'plate' replays the reference take; 'code' (later) is the fully coded version. */
+  variant: 'plate' | 'code';
+  /** Soundtrack under the plate: the whole original mix, effects only, or none. */
+  soundtrack: 'full' | 'sfx' | 'off';
+  currency: { thousands: string; decimal: string; decimals: number; prefix: string; suffix: string };
+  /** Number overrides keyed "<kind>:<key>[:from|:to]"; missing keys show the reference value. */
+  values: Record<string, number>;
+  /** Draw the tap areas (spin button) as outlines, for rehearsal. */
+  showTapAreas: boolean;
+}
+
 export interface Preset {
   /** Preview background colour behind the stage. */
   background: string;
@@ -83,6 +95,7 @@ export interface Preset {
   home: HomeConfig;
   /** Duration of the app-open zoom, ms. */
   appOpenMs: number;
+  game: GameConfig;
 }
 
 /** Logical stage size: iPhone portrait (19.5:9). */
@@ -124,6 +137,13 @@ export const DEFAULT_PRESET: Preset = {
   exitTapWindowMs: 800,
   exitTapCount: 3,
   appOpenMs: 450,
+  game: {
+    variant: 'plate',
+    soundtrack: 'full',
+    currency: { thousands: ',', decimal: '.', decimals: 2, prefix: '', suffix: '' },
+    values: {},
+    showTapAreas: false,
+  },
   statusBar: {
     time: '10:37',
     battery: 42,

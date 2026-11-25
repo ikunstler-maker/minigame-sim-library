@@ -40,6 +40,12 @@ org has Enterprise Cloud with private Pages. Open question for the user: does th
 company plan include private Pages access control? If not: unlisted URL only,
 `noindex`, and no publishing anywhere else (no itch.io).
 
+**Update 2026-11-25:** the user chose to publish the game's site assets
+(`public/private/`: plate video, soundtrack, patches, icon) with the public repo and
+GitHub Pages, so the game runs on the iPhone from the site ("the repo is a prototype,
+I do not mind if someone sees it"). The raw kit `Assets/` (reference video, audio
+stems, press kit) stays local and gitignored.
+
 ## D7. Storage
 IndexedDB autosave + JSON preset export/import. No GitHub token in the browser
 (dropped from the external plan).
