@@ -121,6 +121,22 @@ export class HomeScreen extends Container {
       s.width = ICON;
       s.height = ICON;
       art = s;
+    } else if (slot.role === 'game') {
+      // the game's icon is not available (private art): make it obvious it must be set in Studio
+      art = new Container();
+      art.addChild(new Graphics().roundRect(0, 0, ICON, ICON, ICON_RADIUS).fill({ color: 0xff8a00, alpha: 0.18 }));
+      art.addChild(
+        new Graphics()
+          .roundRect(1.5 * PT, 1.5 * PT, ICON - 3 * PT, ICON - 3 * PT, ICON_RADIUS)
+          .stroke({ color: 0xff8a00, width: 2.4 * PT, alpha: 0.95 }),
+      );
+      const t = new Text({
+        text: '+\nyour icon',
+        style: { fontFamily: IOS_FONT, fontSize: 11 * PT, fontWeight: '700', fill: 0xff8a00, align: 'center', lineHeight: 13 * PT },
+      });
+      t.anchor.set(0.5);
+      t.position.set(ICON / 2, ICON / 2);
+      art.addChild(t);
     } else {
       // placeholder: rounded tile with the first letter
       art = new Container();

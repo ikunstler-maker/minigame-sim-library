@@ -4,6 +4,55 @@ import { fileToIcon, fileToWallpaper, pickImage } from './images';
 
 type SlotRef = { area: 'grid' | 'dock'; index: number };
 
+/** Small inline SVG for a weather condition (Studio mock only). */
+function condSvg(cond: string): string {
+  const cloud = '<path d="M6 17h11a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.6 1.6A3.3 3.3 0 0 0 6 17z" fill="#fff"/>';
+  const sun = '<circle cx="15" cy="8" r="4" fill="#ffcc00"/>';
+  const body =
+    cond === 'sunny' ? '<circle cx="12" cy="12" r="5" fill="#ffcc00"/>'
+    : cond === 'partly-cloudy' ? sun + cloud
+    : cond === 'night-clear' ? '<path d="M15 4a8 8 0 1 0 5 13A7 7 0 0 1 15 4z" fill="#fff"/>'
+    : cond === 'rain' ? cloud + '<path d="M9 19l-1 3M13 19l-1 3M17 19l-1 3" stroke="#5ac8fa" stroke-width="1.6"/>'
+    : cond === 'snow' ? cloud + '<circle cx="9" cy="21" r="1" fill="#fff"/><circle cx="13" cy="21" r="1" fill="#fff"/>'
+    : cloud;
+  return `<svg viewBox="0 0 24 24" width="1em" height="1em">${body}</svg>`;
+}
+
+/** Status-bar mock matching the canvas one. */
+function statusBarHtml(p: Preset): string {
+  const sb = p.statusBar;
+  const bars = [4.5, 6.5, 8.5, 11]
+    .map((h, i) => `<rect x="${i * 4.6}" y="${11 - h}" width="3.2" height="${h}" rx="0.9" opacity="${i < sb.signal ? 1 : 0.3}"/>`)
+    .join('');
+  const wifi = sb.wifi
+    ? '<svg viewBox="0 0 16 12" class="i"><path d="M8 11 4.8 7.8a4.5 4.5 0 0 1 6.4 0z"/><path d="M2.6 5.6a7.6 7.6 0 0 1 10.8 0M.4 3.4a10.7 10.7 0 0 1 15.2 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+    : '';
+  const lvl = Math.max(0, Math.min(100, sb.battery));
+  const fill = sb.charging ? '#34c759' : sb.lowPowerMode ? '#ffcc00' : lvl <= 20 ? '#ff3b30' : 'currentColor';
+  return `<div class="sb ${sb.style}">
+    <span class="t">${esc(sb.time)}</span>
+    ${sb.showDynamicIsland ? '<span class="island"></span>' : ''}
+    <span class="r">
+      <svg viewBox="0 0 18 11" class="i">${bars}</svg>${wifi}
+      <span class="bat"><span style="width:${lvl}%;background:${fill}"></span>${sb.batteryShowPercent ? `<b>${lvl}</b>` : ''}</span>
+    </span></div>`;
+}
+
+/** Weather widget mock matching the canvas one. */
+function widgetHtml(p: Preset): string {
+  const w = p.weather;
+  const h0 = Number.parseInt(p.statusBar.time, 10) || 0;
+  const hours = w.hourly.slice(0, 6).map((f, i) => {
+    const h = (h0 + 1 + i) % 24;
+    const lbl = w.hourFormat === '24h' ? String(h) : `${h % 12 || 12}${h < 12 ? 'AM' : 'PM'}`;
+    return `<div><small>${lbl}</small>${condSvg(f.condition)}<b>${f.temp}°</b></div>`;
+  }).join('');
+  return `<div class="widget-block" style="background:linear-gradient(${w.gradient[0]},${w.gradient[1]})">
+    <div class="wt"><div><b>${esc(w.city)}${w.showLocationArrow ? ' ➤' : ''}</b><span class="big">${w.temp}°</span></div>
+    <div class="wr">${condSvg(w.condition)}<span>${esc(w.conditionLabel)}</span><span>${esc(w.highLabel)}:${w.high}° ${esc(w.lowLabel)}:${w.low}°</span></div></div>
+    <div class="wh">${hours}</div></div>`;
+}
+
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
 /**
@@ -52,7 +101,7 @@ export class HomeEditor {
     let grid = '';
     for (let r = 0; r < GRID_ROWS; r++) {
       if (wr.has(r)) {
-        if (!wr.has(r - 1)) grid += `<div class="widget-block">${esc(p.weather.city)} ${p.weather.temp}°<small>Weather widget</small></div>`;
+        if (!wr.has(r - 1)) grid += widgetHtml(p);
         continue;
       }
       for (let c = 0; c < GRID_COLS; c++) grid += cell({ area: 'grid', index: r * GRID_COLS + c });
@@ -61,6 +110,7 @@ export class HomeEditor {
     const wall = p.home.wallpaper;
     this.root.innerHTML = `
       <div class="phone" style="background-image:url('${esc(wall)}')">
+        ${statusBarHtml(p)}
         <div class="grid">${grid}</div>
         <div class="dock">${dock}</div>
       </div>
@@ -96,6 +146,18 @@ export class HomeEditor {
       p.home.dock = structuredClone(DEFAULT_PRESET.home.dock);
       this.commit(p);
       this.render();
+    });
+
+    // Missing art (e.g. private game icon on the public build) → clear "add your icon" tile.
+    this.root.querySelectorAll<HTMLImageElement>('.cell img').forEach((img) => {
+      const swap = () => {
+        const ph = document.createElement('span');
+        ph.className = 'ph need';
+        ph.textContent = '+ icon';
+        img.replaceWith(ph);
+      };
+      if (img.complete && img.naturalWidth === 0) swap();
+      else img.addEventListener('error', swap);
     });
 
     this.root.querySelectorAll<HTMLElement>('.cell').forEach((el) => {
