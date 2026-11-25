@@ -7,6 +7,7 @@ import { HomeEditor } from './studio/HomeEditor';
 import { loadCatalog } from './ios/iconCatalog';
 import { itemText, valueKey, type PatchText } from './games/coin-volcano-plate/numbersLayer';
 import { editableValues } from './games/coin-volcano-code/values';
+import { fileToIcon, pickImage } from './studio/images';
 
 const studioEl = document.getElementById('studio')!;
 const previewEl = document.getElementById('preview')!;
@@ -89,11 +90,21 @@ async function renderStudio(): Promise<void> {
       ${text('game.currency.thousands', 'Thousands separator')}
       ${text('game.currency.decimal', 'Decimal separator')}
       ${select('game.currency.decimals', 'Decimals', [0, 1, 2], true)}
-      ${check('game.waitForTaps', 'Wait for my tap on Spin and on BONUS GAME')}
-      ${num('game.autoContinueMs', 'Otherwise continue after (ms)', 0, 5000)}
+      ${check('game.manualSpin', 'Manual play: I tap Spin myself (or Auto in the game)')}
+      ${num('game.autoContinueMs', 'Auto: pause at Spin / BONUS GAME (ms)', 0, 5000)}
       ${check('game.showTapAreas', 'Show tap areas (rehearsal)')}
       <p class="note">Numbers (empty = value from the reference video):</p>
       <div id="game-values" class="values"><p class="note">Loading…</p></div>
+    </section></details>
+
+    <details><summary>Notification (end of the take)</summary><section>
+      ${check('push.enabled', 'Show a notification after the big win')}
+      <div class="push-icon"><img id="push-icon-img" alt=""><select id="push-icon-sel"></select><button id="push-icon-up">Upload…</button></div>
+      ${text('push.title', 'Title')}
+      <label>Text <textarea data-path="push.body" rows="3">${attr(preset.push.body)}</textarea></label>
+      ${text('push.timeLabel', 'Time label')}
+      ${num('push.delayMs', 'Delay after the win (ms)', 0, 10000)}
+      ${select('push.style', 'Style', ['light', 'dark'])}
     </section></details>
 
     <details><summary>Status bar</summary><section>
@@ -137,7 +148,8 @@ async function renderStudio(): Promise<void> {
     <div class="row"><button id="b-reset">Reset all settings</button></div>
   `;
 
-  studioEl.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-path]').forEach((el) => {
+  void bindPushIcon();
+  studioEl.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[data-path]').forEach((el) => {
     el.addEventListener('change', () => {
       const p = structuredClone(preset);
       const type = el.dataset.type;
@@ -156,6 +168,37 @@ async function renderStudio(): Promise<void> {
   });
   homeEditor = new HomeEditor(document.getElementById('home-editor')!, () => preset, commit, await loadCatalog());
   void renderGameValues();
+}
+
+/** Notification icon: pick from the icon collection or upload a PNG. */
+async function bindPushIcon(): Promise<void> {
+  const img = document.getElementById('push-icon-img') as HTMLImageElement | null;
+  const sel = document.getElementById('push-icon-sel') as HTMLSelectElement | null;
+  const up = document.getElementById('push-icon-up');
+  if (!img || !sel || !up) return;
+  const cat = await loadCatalog();
+  const refresh = () => {
+    const p = preset.push;
+    img.src = p.iconId === 'custom' ? (p.customSrc ?? '') : (cat.find((c) => c.id === p.iconId)?.url ?? '');
+    sel.value = p.iconId;
+  };
+  sel.innerHTML = cat.map((c) => `<option value="${attr(c.id)}">${c.label}</option>`).join('') + '<option value="custom">Uploaded PNG</option>';
+  refresh();
+  sel.addEventListener('change', () => {
+    const p = structuredClone(preset);
+    p.push.iconId = sel.value;
+    commit(p);
+    refresh();
+  });
+  up.addEventListener('click', async () => {
+    const f = await pickImage();
+    if (!f) return;
+    const p = structuredClone(preset);
+    p.push.iconId = 'custom';
+    p.push.customSrc = await fileToIcon(f);
+    commit(p);
+    refresh();
+  });
 }
 
 /** Fields for the element-based variant, from its script.json. */
@@ -247,9 +290,18 @@ async function startPreview(): Promise<void> {
 }
 
 async function stopPreview(): Promise<void> {
-  const rec = recorder ? await recorder.stop() : null;
+  let rec: Recording | null = null;
+  try {
+    rec = recorder ? await recorder.stop() : null;
+  } catch (e) {
+    console.warn('recorder stop failed', e);
+  }
   recorder = null;
-  stage?.destroy();
+  try {
+    stage?.destroy();
+  } catch (e) {
+    console.warn('stage destroy failed', e);
+  }
   stage = null;
   if (rec) {
     lastRecording = rec;
@@ -328,5 +380,8 @@ if (qs.has('game')) {
   const t = qs.get('t');
   const variant = qs.get('variant');
   if (variant === 'plate' || variant === 'code') preset = { ...preset, game: { ...preset.game, variant } };
-  void startPreview().then(() => stage?.openGameDirect(t === null ? undefined : Number(t)));
+  if (qs.has('auto')) preset = { ...preset, game: { ...preset.game, manualSpin: false } };
+  void startPreview()
+    .then(() => stage?.openGameDirect(t === null ? undefined : Number(t)))
+    .then(() => (qs.has('push') ? stage?.debugShowPush() : undefined));
 }

@@ -192,7 +192,11 @@ export class PlateGame extends Container implements GamePlugin {
   /** Stop everything and free resources. */
   override destroy(): void {
     if (this.autoTimer) clearTimeout(this.autoTimer);
-    this.ticker?.remove(this.onTick, this);
+    try {
+      this.ticker?.remove(this.onTick, this);
+    } catch {
+      /* the app's ticker may already be destroyed */
+    }
     this.ticker = null;
     const v = this.video.video;
     v.removeEventListener('playing', this.onVideoPlaying);

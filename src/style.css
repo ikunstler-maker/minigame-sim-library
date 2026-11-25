@@ -26,7 +26,8 @@ button, .btn {
 #stage-wrap { position: relative; }
 #stage-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
 /* Transparent hotspot over the status-bar clock. Lives in the DOM, not the canvas. */
-#exit-hotspot { position: absolute; left: 0; top: 0; width: 30%; height: 6%; z-index: 2; }
+/* Exactly over the status-bar time (centre 66 pt, 29 pt of a 402x874 pt screen), finger-sized. */
+#exit-hotspot { position: absolute; left: 6%; top: 0.5%; width: 21%; height: 5.6%; z-index: 2; touch-action: manipulation; }
 
 details { border-top: 1px solid #222; padding: 10px 0; }
 summary { font-size: 18px; font-weight: 600; cursor: pointer; padding: 6px 0; }
@@ -92,3 +93,8 @@ label.chk { justify-content: flex-start; }
 .pick.on { outline: 3px solid #ff8a00; outline-offset: 2px; }
 
 #export video { width: 100%; max-height: 65vh; background: #111; border-radius: 12px; }
+
+.push-icon { display: flex; gap: 10px; align-items: center; }
+.push-icon img { width: 44px; height: 44px; border-radius: 22%; background: #2c2c2e; object-fit: cover; }
+.push-icon select { flex: 1; }
+textarea { font: inherit; font-size: 16px; padding: 6px; background: #1b1b1f; color: #eee; border: 1px solid #333; border-radius: 8px; width: 60%; }

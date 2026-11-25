@@ -328,7 +328,11 @@ export class CodeGame extends Container implements GamePlugin {
   /** Stop everything and free resources. */
   override destroy(): void {
     if (this.autoTimer) clearTimeout(this.autoTimer);
-    this.ticker?.remove(this.onTick, this);
+    try {
+      this.ticker?.remove(this.onTick, this);
+    } catch {
+      /* the app's ticker may already be destroyed */
+    }
     this.ticker = null;
     for (const e of this.fxList) e.destroy();
     this.fxList = [];
@@ -624,6 +628,7 @@ export class CodeGame extends Container implements GamePlugin {
   // ---------------------------------------------------------------- render(t)
 
   private render(t: number): void {
+    if (this.autoMode) this.showAutoRing();
     const s = this.script;
     const b: BoardKey = t < s.boardSwitch ? 'base' : 'bonus';
     const L = this.layout[b];
@@ -859,6 +864,22 @@ export class CodeGame extends Container implements GamePlugin {
     if (Math.abs(snd.position - this.clock) > MAX_DRIFT_S) snd.startAt(this.clock);
   }
 
+  /** Auto button in the bottom UI (Hough-measured on the board layers), stage px. */
+  private static readonly AUTO_BTN = { base: { cx: 755, cy: 1677, r: 55 }, bonus: { cx: 755, cy: 1750, r: 55 } };
+  /** True after the player tapped Auto: holds continue by themselves. */
+  private autoMode = false;
+  private autoRing: Graphics | null = null;
+
+  private showAutoRing(): void {
+    if (!this.autoRing) {
+      this.autoRing = new Graphics();
+      this.topLayer.addChild(this.autoRing);
+    }
+    const b = CodeGame.AUTO_BTN[this.clock < this.script.boardSwitch ? 'base' : 'bonus'];
+    this.autoRing.clear().circle(b.cx, b.cy, b.r).stroke({ color: 0xffd23a, width: 7, alpha: 0.95 });
+    this.autoRing.visible = this._state !== 'finished';
+  }
+
   private enterHold(h: HoldDef): void {
     this._state = 'holding';
     this.activeHold = h;
@@ -866,7 +887,7 @@ export class CodeGame extends Container implements GamePlugin {
     const v = this.video!;
     v.pause();
     if (this.activeInsert(h.t)) void v.seek(h.t);
-    const wait = this.opts.autoContinueMs;
+    const wait = this.autoMode ? (this.opts.autoContinueMs ?? 700) : this.opts.autoContinueMs;
     if (wait !== undefined && wait >= 0) this.autoTimer = setTimeout(() => this.release(), wait);
   }
 
@@ -886,6 +907,15 @@ export class CodeGame extends Container implements GamePlugin {
     if (this._state === 'blocked') {
       this._state = 'playing';
       this.startVideo();
+      return;
+    }
+    const p0 = this.toLocal(e.global);
+    const ab = CodeGame.AUTO_BTN[this.clock < this.script.boardSwitch ? 'base' : 'bonus'];
+    if (!this.autoMode && Math.hypot(p0.x - ab.cx, p0.y - ab.cy) <= ab.r) {
+      // Auto: from now on every hold continues by itself
+      this.autoMode = true;
+      this.showAutoRing();
+      if (this._state === 'holding') this.release();
       return;
     }
     if (this._state !== 'holding' || !this.activeHold) return;

@@ -1,7 +1,8 @@
 import { Application, Container, Graphics, Sprite } from 'pixi.js';
 import { PT, STAGE_H, STAGE_W, type Preset } from '../config';
 import type { AudioBus } from '../audio/AudioBus';
-import { loadCatalog } from '../ios/iconCatalog';
+import { loadCatalog, slotUrl } from '../ios/iconCatalog';
+import { NotificationBanner } from './ios/NotificationBanner';
 import { GameStub } from './GameStub';
 import { loadTexture } from './textures';
 import { PlateGame } from '../games/coin-volcano-plate/PlateGame';
@@ -152,14 +153,12 @@ export class StageApp {
         ticker: this.app.ticker,
         makeContent: numbers.makeContent,
         showTapAreas: g.showTapAreas,
-        autoContinueMs: g.waitForTaps ? undefined : g.autoContinueMs,
+        autoContinueMs: g.manualSpin ? undefined : g.autoContinueMs,
         onProgress: (p) => this.home?.setGameProgress(p),
       });
       await game.load();
       this.app.ticker.add(() => numbers.update(game.time));
-      game.onFinished = () => {
-        /* Stage 5: push notification and the user's layout page */
-      };
+      game.onFinished = () => this.schedulePush();
       return game;
     } catch (e) {
       console.warn('Plate game unavailable, showing placeholder:', e);
@@ -181,13 +180,11 @@ export class StageApp {
         ticker: this.app.ticker,
         values: g.values,
         currency: g.currency,
-        autoContinueMs: g.waitForTaps ? undefined : g.autoContinueMs,
+        autoContinueMs: g.manualSpin ? undefined : g.autoContinueMs,
         onProgress: (p) => this.home?.setGameProgress(p),
       });
       await game.load();
-      game.onFinished = () => {
-        /* Stage 5: push notification and the user's layout page */
-      };
+      game.onFinished = () => this.schedulePush();
       return game;
     } catch (e) {
       console.warn('Code game unavailable, showing placeholder:', e);
@@ -210,8 +207,49 @@ export class StageApp {
     (window as unknown as { plate: PlateGame | CodeGame }).plate = game;
   }
 
+  /** Show the end-of-take notification banner (Stage 5 adds tap → layout page). */
+  private schedulePush(): void {
+    const p = this.preset.push;
+    if (!p.enabled) return;
+    setTimeout(() => void this.showPush(), Math.max(0, p.delayMs));
+  }
+
+  /** Dev aid: show the notification now (`?game&t=38&push`). */
+  debugShowPush(): Promise<void> {
+    return this.showPush();
+  }
+
+  private async showPush(): Promise<void> {
+    if (this.app.renderer === null) return;
+    const p = this.preset.push;
+    const url = p.iconId === 'custom' ? (p.customSrc ?? '') : slotUrl({ iconId: p.iconId, label: '', role: 'app' }, await loadCatalog());
+    const banner = new NotificationBanner(p, await loadTexture(url));
+    this.statusLayer.addChild(banner);
+    await banner.show(this.app.ticker);
+  }
+
   /** Tear down the renderer and all scenes. */
   destroy(): void {
-    this.app.destroy(true, { children: true });
+    // Stop the game before the renderer and its ticker go away.
+    this.app.ticker.stop();
+    for (const c of [...this.scenes.children]) {
+      try {
+        c.destroy({ children: true });
+      } catch (e) {
+        console.warn('scene destroy failed', e);
+      }
+    }
+    void this.gamePromise?.then((g) => {
+      try {
+        if (g && !g.destroyed) g.destroy();
+      } catch {
+        /* already gone */
+      }
+    });
+    try {
+      this.app.destroy(true, { children: true });
+    } catch (e) {
+      console.warn('app destroy failed', e);
+    }
   }
 }

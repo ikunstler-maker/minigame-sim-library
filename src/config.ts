@@ -67,6 +67,21 @@ export interface HomeConfig {
   searchLabel: string;
 }
 
+/** Notification banner shown at the end of the take. */
+export interface PushConfig {
+  enabled: boolean;
+  /** Catalog icon id (e.g. 'coin-volcano') or 'custom' with customSrc. */
+  iconId: string;
+  customSrc?: string;
+  title: string;
+  body: string;
+  /** Right-hand time text, e.g. "now". */
+  timeLabel: string;
+  /** Delay after the game ends, ms. */
+  delayMs: number;
+  style: 'light' | 'dark';
+}
+
 export interface GameConfig {
   /** 'plate' replays the reference take; 'code' (later) is the fully coded version. */
   variant: 'plate' | 'code';
@@ -79,6 +94,11 @@ export interface GameConfig {
   showTapAreas: boolean;
   /** Wait for a tap on Spin and on the BONUS GAME splash (like the real game) instead of continuing by itself. */
   waitForTaps: boolean;
+  /**
+   * Manual play (default): the player taps Spin, or Auto to let the take run by itself.
+   * Off = the take runs by itself from the start. Replaces `waitForTaps` (kept for old presets).
+   */
+  manualSpin: boolean;
   /** Pause at each of those moments before continuing by itself, ms. */
   autoContinueMs: number;
 }
@@ -100,6 +120,7 @@ export interface Preset {
   /** Duration of the app-open zoom, ms. */
   appOpenMs: number;
   game: GameConfig;
+  push: PushConfig;
 }
 
 /** Logical stage size: iPhone portrait (19.5:9). */
@@ -141,6 +162,15 @@ export const DEFAULT_PRESET: Preset = {
   exitTapWindowMs: 800,
   exitTapCount: 3,
   appOpenMs: 450,
+  push: {
+    enabled: true,
+    iconId: 'coin-volcano',
+    title: 'Coin Volcano',
+    body: 'Your win is waiting! Tap to collect it.',
+    timeLabel: 'now',
+    delayMs: 900,
+    style: 'light',
+  },
   game: {
     variant: 'code',
     soundtrack: 'full',
@@ -148,6 +178,7 @@ export const DEFAULT_PRESET: Preset = {
     values: {},
     showTapAreas: false,
     waitForTaps: false,
+    manualSpin: true,
     autoContinueMs: 700,
   },
   statusBar: {
