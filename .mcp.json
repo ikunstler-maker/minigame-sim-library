@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "godot": {
+      "command": "cmd",
+      "args": ["/c", "C:\\Program Files\\nodejs\\npx.cmd", "-y", "@coding-solo/godot-mcp"],
+      "env": {
+        "GODOT_PATH": "C:\\Users\\Admin\\Documents\\PROGRAMS\\Godot_v4.7.2-stable_win64\\Godot_v4.7.2-stable_win64.exe"
+      }
+    },
+    "blender": {
+      "command": "C:\\Users\\Admin\\AppData\\Local\\Microsoft\\WinGet\\Links\\uvx.exe",
+      "args": ["mcp-for-blender"],
+      "env": {
+        "BLENDER_MCP_SAFE_MODE": "1",
+        "DISABLE_TELEMETRY": "true"
+      }
+    },
+    "elevenlabs": {
+      "type": "http",
+      "url": "https://api.elevenlabs.io/v1/mcp"
+    }
+  }
+}
